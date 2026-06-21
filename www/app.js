@@ -291,6 +291,21 @@ const SecureStorage = (() => {
     }
   }
 
+  // funzione per convertire logo APP in base 64
+  async function getAppLogoBase64() {
+  try {
+    const response = await fetch('icons/icon-maskable-512x512.png');
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) {
+    return '';
+  }
+}
+
   // --- API pubblica ---
 
   /**
@@ -2145,7 +2160,7 @@ function buildLineupRows(m) {
 // END SHARED REPORT BUILDER FUNCTIONS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function exportReport() {
+async function exportReport() {
   if(!settings.reportExportEnabled){ toast('⚙️ '+t('report.export_disabled')); return; }
   const id = document.getElementById('report-match-select').value;
   const m  = state.matches.find(x=>x.id===id);
@@ -2157,6 +2172,18 @@ function exportReport() {
   const courtImgEl = document.querySelector('#court-svg image');
   const courtImg   = courtImgEl ? courtImgEl.getAttribute('href') : '';
   const teamLogo   = settings.teamLogo || '';  
+
+   // Converti logo app in base64 per il report standalone
+  let appLogo = '';
+  try {
+    const resp = await fetch('icons/icon-maskable-512x512.png');
+    const blob = await resp.blob();
+    appLogo = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) { appLogo = ''; }
 
   // Build shot data as JSON for interactive filter in exported page
   const allShots = m.players.flatMap(p=>Object.values(m.stats[p.id]||{}).flatMap(s=>s.shots||[]));
@@ -2266,9 +2293,9 @@ function exportReport() {
     alt="Logo">` : ''}
 
   <!-- LOGO APP IN ALTO A DESTRA -->
-  <img src="icons/icon-maskable-512x512.png" class="app-logo-fixed"
-    style="position:absolute;top:0;right:0;width:56px;height:56px;border-radius:50%;object-fit:cover"
-    alt="BasketBubble"/>
+${appLogo ? `<img src="${appLogo}" class="app-logo-fixed"
+  style="position:absolute;top:0;right:0;width:56px;height:56px;border-radius:50%;object-fit:cover"
+  alt="BasketBubble"/>` : ''}
 
 </div>
 
@@ -2329,7 +2356,12 @@ ${renderTeamTotalsHTML(rows, 'export')}
 <div style="display:flex;gap:0;margin-bottom:10px;background:#1c1c27;border-radius:10px;padding:3px">
 <button id="exp-tab-dots" data-exptab="dots" style="flex:1;padding:7px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#f5a623;color:#000">${t('report.tab.precise_shots')}</button>
 <button id="exp-tab-bubble" data-exptab="bubble" style="flex:1;padding:7px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:#888">${t('report.tab.zone_bubbles')}</button></div>
-<div class="court-wrap" id="exp-map-wrap">
+
+ <!-- <div style="display:flex;margin:0 0 6px;align-items:center;gap:8px"> -->
+  <!-- <span style="font-size:10px;color:#888">🔍 ${t('report.shotmap.zoom_hint')}</span> -->
+ <!-- </div> -->
+
+<div class="court-wrap" id="exp-map-wrap" ondblclick="openExpZoomMap()" style="cursor:zoom-in">
   <svg id="exp-svg" viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
     <g transform="scale(1,-1) translate(0,-569)">
       <image href="${courtImg}" x="0" y="0" width="923" height="569" preserveAspectRatio="xMidYMid meet"/>
@@ -2339,7 +2371,7 @@ ${renderTeamTotalsHTML(rows, 'export')}
   </svg>
   <div class="legend" id="exp-legend"></div>
 </div>
-\u003cscript\u003e
+\u003cscript\u003e   // qui inizia lo script
  // FIX MODALE PALERY IN REPORT ESPORTATO
  const _i18n = {
     pts_label:     ${JSON.stringify(t('player.pts_label'))},
@@ -2375,6 +2407,28 @@ function calcPmForPeriods(periods) {
 }
 const _teamLogo = "${teamLogo}";
 let _expTab = 'dots';
+
+function openExpZoomMap() {
+  const svg = document.getElementById('exp-svg');
+  if (!svg) return;
+  const clone = svg.cloneNode(true);
+  const isPortrait = window.innerHeight > window.innerWidth;
+  if (isPortrait) {
+    clone.style.cssText = 'width:100vh;height:100vw;max-width:100vh;transform:rotate(90deg);display:block';
+  } else {
+    clone.style.cssText = 'width:95vw;height:auto;display:block';
+  }
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+  const closeBtn = document.createElement('div');
+  closeBtn.innerHTML = '✕';
+  closeBtn.style.cssText = 'position:fixed;top:16px;right:16px;color:white;font-size:24px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.15);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;z-index:100000';
+  overlay.addEventListener('click', () => overlay.remove());
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); overlay.remove(); });
+  overlay.appendChild(clone);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+}
 
 // Populate player select
 const sel = document.getElementById('exp-player-filter');
@@ -2618,9 +2672,12 @@ function updateExportMap() {
     document.getElementById('exp-svg').querySelector('rect').setAttribute('fill','rgba(0,0,0,0.22)');
     const made=shots.filter(s=>s.made).length, tot=shots.length;
     document.getElementById('exp-legend').innerHTML =
-      '<span><span class="dot" style="background:#2ecc71"></span>'+t('court.legend_made')+'</span>'+
-      '<span><span class="dot" style="background:#e74c3c"></span>'+t('court.legend_missed')+'</span>'+
-      '<span style="color:#888">'+made+'/'+tot+' ('+(tot?Math.round(made/tot*100):0)+'%)</span>';
+  '<div style="display:flex;align-items:center;justify-content:center;position:relative;width:100%;flex-wrap:wrap;gap:16px">' +
+  '<span><span class="dot" style="background:#2ecc71"></span>'+t('court.legend_made')+'</span>'+
+  '<span><span class="dot" style="background:#e74c3c"></span>'+t('court.legend_missed')+'</span>'+
+  '<span style="color:#888">'+made+'/'+tot+' ('+(tot?Math.round(made/tot*100):0)+'%)</span>'+
+  '<span style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
+  '</div>';
   } else {
     // Bubbles
     const zs={};
@@ -2669,8 +2726,11 @@ function updateExportMap() {
     }).join('');
     document.getElementById('exp-dots').innerHTML = bubbles;
     document.getElementById('exp-svg').querySelector('rect').setAttribute('fill','rgba(0,0,0,0.3)');
-    document.getElementById('exp-legend').innerHTML =
-      '<span style="font-size:10px;color:#888">Dimensione=volume · Colore=% realizzazione</span>';
+document.getElementById('exp-legend').innerHTML =
+  '<div style="display:flex;align-items:center;justify-content:center;position:relative;width:100%">' +
+  '<span style="font-size:10px;color:#888">Dimensione=volume · Colore=% realizzazione</span>' +
+  '<span style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>' +
+  '</div>';
   }
 }
 updateExportMap();
@@ -3021,8 +3081,9 @@ function showPlayer(pid) {
         +'<rect x="0" y="0" width="923" height="569" fill="rgba(0,0,0,0.3)"/>'
         +'</g>'
         +bubbles+'</svg>'
-        +'<div style="display:flex;gap:10px;padding:7px 12px;background:#1c1c27;justify-content:center;flex-wrap:wrap;align-items:center">'
+        +'<div style="display:flex;gap:10px;padding:7px 12px;background:#1c1c27;justify-content:center;flex-wrap:wrap;align-items:center;position:relative">'
         +'<div style="font-size:10px;color:#888">Dimensione = volume tiri &nbsp;|&nbsp; Colore = % realizzazione</div>'
+        +'<div style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</div>'
         +'</div>'
         +'<div style="display:flex;padding:4px 16px 8px;background:#1c1c27;justify-content:center;align-items:center">'
         +'<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'
@@ -3030,6 +3091,7 @@ function showPlayer(pid) {
         +'</div>'
         +'</div></div>'
       : '<div style="color:#555;text-align:center;padding:20px">'+t('misc.no_shots')+'</div>');
+
 
   document.getElementById('pp').style.display='block';
   document.body.style.overflow='hidden';
@@ -3664,9 +3726,9 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
 
   return `
     <!-- ── TAB switcher ── -->
-    <div style="display:flex;margin:0 16px 6px;align-items:center;gap:8px">
-      <span style="font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</span>
-    </div>
+   <!--   <div style="display:flex;margin:0 16px 6px;align-items:center;gap:8px">-->
+   <!--     <span style="font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</span>-->
+   <!--   </div> -->
     <div style="display:flex;margin:0 16px 10px;background:var(--surface2);border-radius:10px;padding:3px;gap:3px">
 		<button id="${px}tab-dots" data-action="shotMapTab" data-tab="dots" data-prefix="${px}"
 			style="flex:1;padding:7px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#000">
@@ -3692,11 +3754,12 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
       </g>
       ${dots}
     </svg>
-    <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
-      <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
-    </div>
+ <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap;position:relative;align-items:center">
+  <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
+  <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
+  <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
+  <div style="position:absolute;right:12px;font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</div>
+</div>
   </div>
 </div>
 
@@ -3719,10 +3782,11 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
     <div style="display:flex;gap:10px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap;align-items:center">
       <div style="font-size:10px;color:var(--text2)">${t('shotmap.bubble.legend')}</div>
     </div>
-    <div style="display:flex;gap:0;padding:4px 16px 8px;background:var(--surface2);justify-content:center;align-items:center">
-      <div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>
-      <div style="font-size:9px;color:var(--text3);margin-left:6px">${t('shotmap.bubble.gradient')}</div>
-    </div>
+<div style="display:flex;gap:0;padding:4px 16px 8px;background:var(--surface2);justify-content:center;align-items:center;position:relative">
+  <div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>
+  <div style="font-size:9px;color:var(--text3);margin-left:6px">${t('shotmap.bubble.gradient')}</div>
+  <div style="position:absolute;right:12px;font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</div>
+</div>
     </div>
   </div>
 </div>`;

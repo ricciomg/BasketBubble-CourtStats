@@ -70,7 +70,7 @@ const STRINGS = {
   'modal.addPlayer.save_btn':    { it: 'Salva Giocatore',     en: 'Save Player'         },
   'modal.addPlayer.cancel_btn':  { it: 'Annulla',             en: 'Cancel'              },
   'modal.addPlayer.import':      { it: '  📂 Importa CSV',             en: '  📂 Import CSV'              },
-  'modal.addPlayer.csvdesc':     { it: 'Cognome NOME,Numero,Ruolo - senza intestazioni',             en: 'Full Name,Number,Position - without header'              },
+  'modal.addPlayer.csvdesc':     { it: 'Cognome Nome,Numero,Ruolo - senza riga di intestazione',             en: 'Full Name,Number,Position - without header'              },
 
   // ─── PAGINA PARTITE ──────────────────────────────────────────────
   'matches.title':       { it: 'PARTITE',          en: 'MATCHES'           },
