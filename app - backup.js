@@ -167,17 +167,6 @@ document.addEventListener('click', function(e) {
   else { console.warn('[CSP] Azione non registrata in ACTION_MAP:', action); }
 }, false);
 
-// Listener delegato per doppio click
-document.addEventListener('dblclick', function(e) {
-  const el = e.target.closest('[data-dblclick]');
-  if (!el) return;
-  const action = el.getAttribute('data-dblclick');
-  if (action === 'openZoomMap') {
-    openZoomMap(el.dataset.container, el.dataset.title);
-  }
-});
-
-
 // Listener delegato per change (select, input[type=file])
 document.addEventListener('change', function(e) {
   const el = e.target.closest('[data-change]');
@@ -3678,31 +3667,31 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
 		</button>
     </div>
 
-<!-- ── DOTS view ── -->
-<div id="${px}shotmap-dots" style="display:block">
-  <div data-dblclick="openZoomMap" data-container="${px}shotmap-dots" data-title="${t('report.shotmap.zoom_hint')}" style="margin:0 16px 8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:zoom-in">
-    <svg viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="glow-g"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="glow-r"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <g transform="scale(1,-1) translate(0,-569)">
-        <image href="${courtImg}" x="0" y="0" width="923" height="569" preserveAspectRatio="xMidYMid meet"/>
-        <rect x="0" y="0" width="923" height="569" fill="rgba(0,0,0,0.22)"/>
-      </g>
-      ${dots}
-    </svg>
-    <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
-      <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
+    <!-- ── DOTS view ── -->
+    <div id="${px}shotmap-dots" style="display:block">
+      <div style="margin:0 16px 8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:zoom-in" ondblclick="openZoomMap('${px}shotmap-dots','Tiri Precisi')" title="Doppio tap per ingrandire">
+        <svg viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-g"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="glow-r"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g transform="scale(1,-1) translate(0,-569)">
+            <image href="${courtImg}" x="0" y="0" width="923" height="569" preserveAspectRatio="xMidYMid meet"/>
+            <rect x="0" y="0" width="923" height="569" fill="rgba(0,0,0,0.22)"/>
+          </g>
+          ${dots}
+        </svg>
+        <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
+          <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
   <!-- ── BUBBLE view ── -->
   <div id="${px}shotmap-bubble" style="display:none">
-  <div data-dblclick="openZoomMap" data-container="${px}shotmap-bubble" data-title="${t('report.tab.zone_bubbles')}" style="margin:0 16px 8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:zoom-in">
+    <div style="margin:0 16px 8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:zoom-in" ondblclick="openZoomMap('${px}shotmap-bubble','${t('shotmap.bubble.title')}')" title="${t('shotmap.zoom.hint')}">
     <svg viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="bblur" x="-50%" y="-50%" width="200%" height="200%">
@@ -3725,7 +3714,9 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
     </div>
     </div>
   </div>
-</div>`;
+
+  
+    </div>`;
 }
 
 function shotMapTab(tab, prefix) {

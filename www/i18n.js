@@ -322,6 +322,11 @@ const STRINGS = {
                                    en: 'Synced at {h}:{m}'                         },
   'drive.not_connected':         { it: 'Non connesso',      en: 'Not connected'   },
 
+
+  // ─── MAPPA TIRI — selezione ────────────────────────────────────────
+  'report.tab.precise_shots': { it: '📍 Tiri Precisi', en: '📍 Precise Shots' },
+  'report.tab.zone_bubbles':  { it: '🫧 Bolle per Zona',   en: '🫧 Zone Bubbles' },
+
   // ─── MAPPA TIRI — legenda ────────────────────────────────────────
   'court.title':    { it: 'Seleziona zona del campo',   en: 'Shot zone selection'   },
   'court.made':    { it: 'Segnato',   en: 'Made'   },
@@ -332,6 +337,9 @@ const STRINGS = {
   'court.title_shot':    { it: 'REGISTRA TIRO', en: 'RECORD SHOT'                 },
   'court.type_2pt':      { it: '2 PUNTI',       en: '2 POINTS'                    },
   'court.type_3pt':      { it: '3 PUNTI',       en: '3 POINTS'                    },
+  'shotmap.bubble.legend':    { it: 'Dimensione proporzionale al numero di tiri',       en: 'Size proportional to the number of shots'  },
+  'shotmap.bubble.gradient':  { it: 'Percentuale di realizzazione 0%->100%',                                         en: 'Realization percentage 0%->100%'                                  },
+  'report.shotmap.zoom_hint': { it: 'Doppio tap per ingrandire',                        en: 'Double tap to zoom'                        },
 
   // ─── ZONE DEL CAMPO ──────────────────────────────────────────────
   // Formato: chiave = 'zone.' + nome-it-normalizzato
@@ -654,8 +662,7 @@ const STRINGS = {
   'report.action.close':   { it: 'Chiudi',      en: 'Close'         },
   'match.result.win':  { it: 'VITTORIA', en: 'WIN' },
   'match.result.loss': { it: 'SCONFITTA', en: 'LOSS' },
-  'report.tab.precise_shots': { it: '📍 Tiri Precisi', en: '📍 Precise Shots' },
-  'report.tab.zone_bubbles':  { it: '🫧 Bolle per Zona',   en: '🫧 Zone Bubbles' },
+
 
   // ─── FILTERS ──────────────────────────────────────────────────────
   'filter.all_players':       { it: 'Tutta la squadra',     en: 'All players'          },
