@@ -3177,86 +3177,104 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
 
   // Prova Capacitor Filesystem prima (APK), poi fallback web
       if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-    showDebugLog('Usando Capacitor Plugins');
-    try {
-      const Filesystem = window.Capacitor.Plugins.Filesystem;
-      showDebugLog('Filesystem plugin: ' + !!Filesystem);
-      const reader = new FileReader();
-      reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
-      reader.onloadend = async () => {
+  showDebugLog('Usando Capacitor Plugins');
   try {
-    showDebugLog('FileReader completato, scrivo file...');
-    const base64 = reader.result.split(',')[1];
+    const Filesystem  = window.Capacitor.Plugins.Filesystem;
+    const Permissions = window.Capacitor.Plugins.Permissions;
 
-    // Prova in ordine: DOCUMENTS → CACHE
-    const candidates = ['DOCUMENTS', 'CACHE'];
-    let written = false;
-
-    for (const dir of candidates) {
+    // Richiedi permesso runtime
+    if (Permissions) {
       try {
-        showDebugLog('Provo directory: ' + dir);
-
-        // mkdir BasketBubble dentro la directory scelta
-        try {
-          await Filesystem.mkdir({
-        path: 'BasketBubble',
-        directory: dir,
-        recursive: true
-      });
-      showDebugLog('mkdir OK in ' + dir);
-        } catch (mkErr) {
-          // Esiste già → va bene lo stesso
-          showDebugLog('mkdir skip (' + dir + '): ' + mkErr.message);
-        }
-
-        const result = await Filesystem.writeFile({
-          path: 'BasketBubble/' + fileName,
-          data: base64,
-          directory: dir
-        });
-
-        // ── Share sheet ──
-        try {
-          const { Share } = window.Capacitor.Plugins;
-          if (Share) {
-            await Share.share({
-              title: fileName,
-              url: result.uri,
-              dialogTitle: 'Condividi report'
-            });
-          } else {
-            toast(t('report.exported_ok') + ' → Documents/BasketBubble/');
+        const check = await Permissions.checkPermissions();
+        showDebugLog('Perm check: ' + JSON.stringify(check));
+        const needRequest = check.publicStorage !== 'granted'
+                         && check.storage      !== 'granted';
+        if (needRequest) {
+          const req = await Permissions.requestPermissions({
+            permissions: ['storage', 'publicStorage']
+          });
+          showDebugLog('Perm request: ' + JSON.stringify(req));
+          const denied = req.storage      === 'denied'
+                      && req.publicStorage === 'denied';
+          if (denied) {
+            toast('Permesso storage negato — impossibile salvare');
+            return;
           }
-        } catch (shareErr) {
-          // Utente ha annullato → non è un errore
-          showDebugLog('Share annullato: ' + shareErr.message);
-          toast(t('report.exported_ok') + ' → Documents/BasketBubble/');
         }
-
-        written = true;
-        break; // successo, esci dal loop
-
-      } catch (writeErr) {
-        showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
+      } catch(permErr) {
+        showDebugLog('Perm error (ignoro): ' + permErr.message);
       }
     }
 
-    if (!written) {
-      throw new Error('Nessuna directory disponibile');
-    }
+    const reader = new FileReader();
+    reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
+    reader.onloadend = async () => {
+      try {
+        showDebugLog('FileReader completato, scrivo file...');
+        const base64 = reader.result.split(',')[1];
 
+        const candidates = ['EXTERNAL_STORAGE', 'DOCUMENTS', 'CACHE'];
+        let written = false;
+
+        for (const dir of candidates) {
+          try {
+            showDebugLog('Provo directory: ' + dir);
+            try {
+              await Filesystem.mkdir({
+                path: 'BasketBubble',
+                directory: dir,
+                recursive: true
+              });
+              showDebugLog('mkdir OK in ' + dir);
+            } catch(mkErr) {
+              showDebugLog('mkdir skip (' + dir + '): ' + mkErr.message);
+            }
+
+            const result = await Filesystem.writeFile({
+              path: 'BasketBubble/' + fileName,
+              data: base64,
+              directory: dir
+            });
+
+            showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
+
+            // Share sheet per aprire/condividere subito
+            try {
+              const { Share } = window.Capacitor.Plugins;
+              if (Share) {
+                await Share.share({
+                  title: fileName,
+                  url: result.uri,
+                  dialogTitle: 'Condividi report'
+                });
+              } else {
+                toast(t('report.exported_ok') + ' → BasketBubble/');
+              }
+            } catch(shareErr) {
+              showDebugLog('Share annullato: ' + shareErr.message);
+              toast(t('report.exported_ok') + ' → BasketBubble/');
+            }
+
+            written = true;
+            break;
+          } catch(writeErr) {
+            showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
+          }
+        }
+
+        if (!written) throw new Error('Nessuna directory disponibile');
+
+      } catch(e) {
+        showDebugLog('Errore finale: ' + e.message);
+        toast('Errore salvataggio: ' + e.message);
+      }
+    };
+    reader.readAsDataURL(blob);
   } catch(e) {
-    showDebugLog('Errore finale: ' + e.message);
-    toast('Errore salvataggio: ' + e.message);
+    showDebugLog('Filesystem error: ' + e.message);
+    toast('Errore: ' + e.message);
   }
-};
-
-      reader.readAsDataURL(blob);
-    } catch(e) {
-      showDebugLog('Filesystem error: ' + e.message);
-      toast('Errore: ' + e.message);
-    }
-  } else {
+} else {
     showDebugLog('Usando fallback web');
     const url = URL.createObjectURL(blob);
     const a   = document.createElement('a');
