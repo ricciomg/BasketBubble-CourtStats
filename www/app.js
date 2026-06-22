@@ -127,6 +127,16 @@ document.addEventListener('click', function(e) {
   const el = e.target.closest('[data-action]');
   if (!el) return;
   const action = el.getAttribute('data-action');
+
+  // ── Flash visivo sul bottone premuto ──
+  const _btn = e.target.closest('.stat-btn');
+  if (_btn) {
+    _btn.classList.remove('flashing');
+    void _btn.offsetWidth;
+    _btn.classList.add('flashing');
+    _btn.addEventListener('animationend', () => _btn.classList.remove('flashing'), { once: true });
+  }
+
   if (action === ZONE_ACTION) { pickZone(e, el); return; }
 
   // ── Azioni con parametri dinamici (data-* attributes) ────────────
@@ -2378,6 +2388,8 @@ ${renderTeamTotalsHTML(rows, 'export')}
    'filter.all_players': ${JSON.stringify(t('filter.all_players'))},
    'court.legend_made':   ${JSON.stringify(t('court.legend_made'))},
    'court.legend_missed': ${JSON.stringify(t('court.legend_missed'))},
+   'report.tab.zone_bubbles':  ${JSON.stringify(t('report.tab.zone_bubbles'))},
+   'report.tab.precise_shots': ${JSON.stringify(t('report.tab.precise_shots'))},
   };
 function t(k){ return _i18n[k] || k; }
 const _players = ${playerShotData};
@@ -2408,22 +2420,46 @@ function openExpZoomMap() {
   const svg = document.getElementById('exp-svg');
   if (!svg) return;
   const clone = svg.cloneNode(true);
-  const isPortrait = window.innerHeight > window.innerWidth;
-  if (isPortrait) {
+  const wasPortrait = window.innerHeight > window.innerWidth;
+
+  if (wasPortrait) {
     clone.style.cssText = 'width:100vh;height:100vw;max-width:100vh;transform:rotate(90deg);display:block';
   } else {
     clone.style.cssText = 'width:95vw;height:auto;display:block';
   }
+
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
+
   const closeBtn = document.createElement('div');
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = 'position:fixed;top:16px;right:16px;color:white;font-size:24px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.15);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;z-index:100000';
-  overlay.addEventListener('click', () => overlay.remove());
-  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); overlay.remove(); });
+
+  const _lockLandscape = () => {
+    if(screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  };
+
+  const close = () => {
+    overlay.remove();
+    window.removeEventListener('orientationchange', _lockLandscape);
+    if(wasPortrait && screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  };
+
+  overlay.addEventListener('click', close);
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+
   overlay.appendChild(clone);
   overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
+
+  if(wasPortrait && screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {});
+    window.addEventListener('orientationchange', _lockLandscape);
+  }
 }
 
 // Populate player select
@@ -2728,7 +2764,11 @@ document.getElementById('exp-legend').innerHTML =
   '<div style="display:flex;align-items:center;justify-content:center;padding-bottom:4px">' +
   '<span style="font-size:10px;color:#888">Dimensione=volume · Colore=% realizzazione</span>' +
   '</div>'+
-  '<div style="text-align:center;padding:2px 0 6px">'+
+  '<div style="display:flex;justify-content:center;align-items:center;padding:2px 0 6px">'+
+  '<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'+
+  '<span style="font-size:9px;color:#555;margin-left:6px">0% → 100%</span>'+
+  '</div>'+
+  '<div style="text-align:center;padding:2px 0 4px">'+
   '<span style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
   '</div>';
   }
@@ -3081,9 +3121,9 @@ function showPlayer(pid) {
         +'<rect x="0" y="0" width="923" height="569" fill="rgba(0,0,0,0.3)"/>'
         +'</g>'
         +bubbles+'</svg>'
-        +'<div style="display:flex;gap:10px;padding:7px 12px;background:#1c1c27;justify-content:center;flex-wrap:wrap;align-items:center;position:relative">'
+        +'<div style="display:flex;flex-direction:column;gap:4px;padding:7px 12px 4px;background:#1c1c27;align-items:center">'
         +'<div style="font-size:10px;color:#888">Dimensione = volume tiri &nbsp;|&nbsp; Colore = % realizzazione</div>'
-        +'<div style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</div>'
+        +'<div style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</div>'
         +'</div>'
         +'<div style="display:flex;padding:4px 16px 8px;background:#1c1c27;justify-content:center;align-items:center">'
         +'<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'
@@ -4245,7 +4285,6 @@ function openZoomMap(svgContainerId, title) {
   if(!container) return;
   const svgEl = container.querySelector('svg');
   if(!svgEl) return;
-  // Clone the SVG so we don't move the original
   const clone = svgEl.cloneNode(true);
 
   const wasPortrait = window.innerHeight > window.innerWidth;
@@ -4259,29 +4298,22 @@ function openZoomMap(svgContainerId, title) {
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = `position:fixed;top:12px;right:12px;color:white;font-size:22px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;z-index:100000`;
 
+  // Handler orientamento: rilancia il lock se il browser lo rilascia
+  const _lockLandscape = () => {
+    if(screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  };
+
   const close = () => {
     overlay.remove();
-    // Ritorna a portrait solo se era portrait prima
+    window.removeEventListener('orientationchange', _lockLandscape);
     if(wasPortrait && screen.orientation && screen.orientation.unlock) {
       screen.orientation.unlock();
     }
   };
- 
 
-
-
-// Close on background tap
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('zoom-map-modal').addEventListener('click', function(e){
-    if(e.target === this || e.target === document.getElementById('zoom-map-inner')) closeZoomMap();
-  });
-  document.getElementById('roster-csv-input').addEventListener('change', e => {
-    importRosterCSV(e.target.files[0]);
-    e.target.value = '';
-  });
-});
-
-overlay.addEventListener('click', close);
+  overlay.addEventListener('click', close);
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
   window.addEventListener('keydown', function onKey(e) {
     if(e.key === 'Escape') { close(); window.removeEventListener('keydown', onKey); }
@@ -4291,10 +4323,62 @@ overlay.addEventListener('click', close);
   overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
 
+  // ── Pinch-to-zoom ──────────────────────────────────────────────
+  let _scale = 1, _lastDist = 0, _tx = 0, _ty = 0;
+  let _startTx = 0, _startTy = 0, _startMidX = 0, _startMidY = 0;
+
+  function _getDist(t) {
+    return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  }
+  function _getMid(t) {
+    return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 };
+  }
+  function _applyTransform() {
+    clone.style.transform = `translate(${_tx}px, ${_ty}px) scale(${_scale})`;
+    clone.style.transformOrigin = '0 0';
+  }
+
+  overlay.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      _lastDist = _getDist(e.touches);
+      const mid = _getMid(e.touches);
+      _startMidX = mid.x; _startMidY = mid.y;
+      _startTx = _tx;     _startTy = _ty;
+    }
+  }, { passive: false });
+
+  overlay.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist  = _getDist(e.touches);
+      const ratio = dist / _lastDist;
+      const newScale = Math.min(Math.max(_scale * ratio, 1), 5);
+      const mid = _getMid(e.touches);
+      _tx = mid.x - ((_startMidX - _startTx) * (newScale / _scale));
+      _ty = mid.y - ((_startMidY - _startTy) * (newScale / _scale));
+      _scale = newScale; _lastDist = dist;
+      _startMidX = mid.x; _startMidY = mid.y;
+      _startTx = _tx;     _startTy = _ty;
+      _applyTransform();
+    }
+  }, { passive: false });
+
+  // Doppio tap per resettare zoom
+  let _lastTap = 0;
+  overlay.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      const now = Date.now();
+      if (now - _lastTap < 300) { _scale = 1; _tx = 0; _ty = 0; _applyTransform(); }
+      _lastTap = now;
+    }
+  });
+  // ── Fine pinch-to-zoom ─────────────────────────────────────────
+
   // Forza landscape solo se era portrait
   if(wasPortrait && screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape').catch(() => {
-      // Fallback: browser non supporta lock, usa rotazione CSS
+      // Fallback CSS rotation
       clone.style.cssText = `
         width:${window.innerHeight}px;
         height:${window.innerWidth}px;
@@ -4307,6 +4391,8 @@ overlay.addEventListener('click', close);
         display:block;
       `;
     });
+    // Rilancia il lock se il sistema lo resetta (es. Capacitor WebView)
+    window.addEventListener('orientationchange', _lockLandscape);
   }
 }
 
