@@ -3128,7 +3128,7 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
   }
 
    const blob = new Blob([standalonePage], {type:'text/html'});
-  const fileName = 'report_'+(m.opponent||'partita').replace(/[^a-zA-Z0-9\u00C0-\u024F_-]/g,'_')+'_'+(m.date||'').replace(/[^0-9-]/g,'_')+'.html';
+   const fileName = 'report_'+(m.opponent||'partita').replace(/[^a-zA-Z0-9\u00C0-\u024F_-]/g,'_')+'_'+(m.date||'').replace(/[^0-9-]/g,'_')+'.html';
 
   showDebugLog('fileName: ' + fileName);
   showDebugLog('blob size: ' + blob.size);
@@ -3144,22 +3144,40 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
       const reader = new FileReader();
       reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
       reader.onloadend = async () => {
-        try {
-          showDebugLog('FileReader completato, scrivo file...');
-          const base64 = reader.result.split(',')[1];
-          const result = await Filesystem.writeFile({
-            path: fileName,
-            data: base64,
-            directory: 'DOWNLOADS',
-            recursive: true
-          });
-          showDebugLog('File scritto: ' + JSON.stringify(result));
-          toast(t('report.exported_ok') + ' → Download');
-        } catch(e) {
-          showDebugLog('writeFile error: ' + e.message);
-          toast('Errore salvataggio: ' + e.message);
-        }
-      };
+         try {
+    showDebugLog('FileReader completato, scrivo file...');
+    const base64 = reader.result.split(',')[1];
+
+    const dir = 'EXTERNAL_STORAGE'; // oppure 'DOCUMENTS' se preferisci
+    const subPath = 'BasketBubble/' + fileName;
+
+    // Crea la cartella se non esiste
+    try {
+      await Filesystem.mkdir({
+        path: 'BasketBubble',
+        directory: dir,
+        recursive: true
+      });
+      showDebugLog('Cartella creata o già esistente');
+    } catch(mkdirErr) {
+      showDebugLog('mkdir (ignorato): ' + mkdirErr.message);
+      // Non bloccare: se esiste già, mkdir lancia eccezione
+    }
+
+    const result = await Filesystem.writeFile({
+      path: subPath,
+      data: base64,
+      directory: dir,
+      // recursive: true  ← non serve se hai già fatto mkdir
+    });
+
+    showDebugLog('File scritto: ' + JSON.stringify(result));
+    toast(t('report.exported_ok') + ' → BasketBubble/');
+  } catch(e) {
+    showDebugLog('writeFile error: ' + e.message);
+    toast('Errore salvataggio: ' + e.message);
+  }
+};
       reader.readAsDataURL(blob);
     } catch(e) {
       showDebugLog('Filesystem error: ' + e.message);
