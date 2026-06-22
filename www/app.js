@@ -2357,10 +2357,6 @@ ${renderTeamTotalsHTML(rows, 'export')}
 <button id="exp-tab-dots" data-exptab="dots" style="flex:1;padding:7px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#f5a623;color:#000">${t('report.tab.precise_shots')}</button>
 <button id="exp-tab-bubble" data-exptab="bubble" style="flex:1;padding:7px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:#888">${t('report.tab.zone_bubbles')}</button></div>
 
- <!-- <div style="display:flex;margin:0 0 6px;align-items:center;gap:8px"> -->
-  <!-- <span style="font-size:10px;color:#888">🔍 ${t('report.shotmap.zoom_hint')}</span> -->
- <!-- </div> -->
-
 <div class="court-wrap" id="exp-map-wrap" ondblclick="openExpZoomMap()" style="cursor:zoom-in">
   <svg id="exp-svg" viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
     <g transform="scale(1,-1) translate(0,-569)">
@@ -2672,11 +2668,13 @@ function updateExportMap() {
     document.getElementById('exp-svg').querySelector('rect').setAttribute('fill','rgba(0,0,0,0.22)');
     const made=shots.filter(s=>s.made).length, tot=shots.length;
     document.getElementById('exp-legend').innerHTML =
-  '<div style="display:flex;align-items:center;justify-content:center;position:relative;width:100%;flex-wrap:wrap;gap:16px">' +
+  '<div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;padding-bottom:4px">' +
   '<span><span class="dot" style="background:#2ecc71"></span>'+t('court.legend_made')+'</span>'+
   '<span><span class="dot" style="background:#e74c3c"></span>'+t('court.legend_missed')+'</span>'+
   '<span style="color:#888">'+made+'/'+tot+' ('+(tot?Math.round(made/tot*100):0)+'%)</span>'+
-  '<span style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
+  '</div>'+
+  '<div style="text-align:center;padding:2px 0 6px">'+
+  '<span style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
   '</div>';
   } else {
     // Bubbles
@@ -2727,9 +2725,11 @@ function updateExportMap() {
     document.getElementById('exp-dots').innerHTML = bubbles;
     document.getElementById('exp-svg').querySelector('rect').setAttribute('fill','rgba(0,0,0,0.3)');
 document.getElementById('exp-legend').innerHTML =
-  '<div style="display:flex;align-items:center;justify-content:center;position:relative;width:100%">' +
+  '<div style="display:flex;align-items:center;justify-content:center;padding-bottom:4px">' +
   '<span style="font-size:10px;color:#888">Dimensione=volume · Colore=% realizzazione</span>' +
-  '<span style="position:absolute;right:12px;font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>' +
+  '</div>'+
+  '<div style="text-align:center;padding:2px 0 6px">'+
+  '<span style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
   '</div>';
   }
 }
@@ -3754,17 +3754,19 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
       </g>
       ${dots}
     </svg>
- <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap;position:relative;align-items:center">
-  <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
-  <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
-  <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
-  <div style="position:absolute;right:12px;font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</div>
-</div>
+    <div style="display:flex;gap:16px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>${t('court.legend_made')}</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--red)"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>${t('court.legend_missed')}</div>
+      <div style="font-size:11px;color:var(--text2);font-weight:600">${totalMade}/${totalShots} — ${totalPct}%</div>
+    </div>
+    <div style="padding:4px 12px 8px;background:var(--surface2);text-align:center">
+      <span style="font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</span>
+    </div>
   </div>
 </div>
 
-  <!-- ── BUBBLE view ── -->
-  <div id="${px}shotmap-bubble" style="display:none">
+<!-- ── BUBBLE view ── -->
+<div id="${px}shotmap-bubble" style="display:none">
   <div data-dblclick="openZoomMap" data-container="${px}shotmap-bubble" data-title="${t('report.tab.zone_bubbles')}" style="margin:0 16px 8px;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:zoom-in">
     <svg viewBox="0 0 923 569" style="width:100%;display:block" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -3782,13 +3784,15 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
     <div style="display:flex;gap:10px;padding:7px 12px;background:var(--surface2);justify-content:center;flex-wrap:wrap;align-items:center">
       <div style="font-size:10px;color:var(--text2)">${t('shotmap.bubble.legend')}</div>
     </div>
-<div style="display:flex;gap:0;padding:4px 16px 8px;background:var(--surface2);justify-content:center;align-items:center;position:relative">
-  <div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>
-  <div style="font-size:9px;color:var(--text3);margin-left:6px">${t('shotmap.bubble.gradient')}</div>
-  <div style="position:absolute;right:12px;font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</div>
-</div>
+    <div style="display:flex;gap:0;padding:4px 16px 4px;background:var(--surface2);justify-content:center;align-items:center">
+      <div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>
+      <div style="font-size:9px;color:var(--text3);margin-left:6px">${t('shotmap.bubble.gradient')}</div>
+    </div>
+    <div style="padding:4px 12px 8px;background:var(--surface2);text-align:center">
+      <span style="font-size:10px;color:var(--text3)">🔍 ${t('report.shotmap.zoom_hint')}</span>
     </div>
   </div>
+</div>
 </div>`;
 }
 
@@ -4130,23 +4134,28 @@ function openZoomMap(svgContainerId, title) {
   if(!svgEl) return;
   // Clone the SVG so we don't move the original
   const clone = svgEl.cloneNode(true);
-  // Make it large for zoom
-  clone.style.width = 'min(95vw, 900px)';
-  clone.style.height = 'auto';
-  clone.style.touchAction = 'pinch-zoom';
-  const inner = document.getElementById('zoom-map-inner');
-  inner.innerHTML = '';
-  inner.appendChild(clone);
-  document.getElementById('zoom-map-title').textContent = title || 'Mappa Tiri';
-  document.getElementById('zoom-map-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
 
-function closeZoomMap() {
-  document.getElementById('zoom-map-modal').classList.remove('open');
-  document.getElementById('zoom-map-inner').innerHTML = '';
-  document.body.style.overflow = '';
-}
+  const wasPortrait = window.innerHeight > window.innerWidth;
+
+  clone.style.cssText = `width:100%;height:100%;display:block;object-fit:contain`;
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:99999;display:flex;align-items:center;justify-content:center;overflow:hidden`;
+
+  const closeBtn = document.createElement('div');
+  closeBtn.innerHTML = '✕';
+  closeBtn.style.cssText = `position:fixed;top:12px;right:12px;color:white;font-size:22px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;z-index:100000`;
+
+  const close = () => {
+    overlay.remove();
+    // Ritorna a portrait solo se era portrait prima
+    if(wasPortrait && screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  };
+ 
+
+
 
 // Close on background tap
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -4159,7 +4168,34 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
 });
 
+overlay.addEventListener('click', close);
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+  window.addEventListener('keydown', function onKey(e) {
+    if(e.key === 'Escape') { close(); window.removeEventListener('keydown', onKey); }
+  });
 
+  overlay.appendChild(clone);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+
+  // Forza landscape solo se era portrait
+  if(wasPortrait && screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(() => {
+      // Fallback: browser non supporta lock, usa rotazione CSS
+      clone.style.cssText = `
+        width:${window.innerHeight}px;
+        height:${window.innerWidth}px;
+        transform:rotate(90deg);
+        transform-origin:center center;
+        position:absolute;
+        top:50%;left:50%;
+        margin-left:${-window.innerHeight/2}px;
+        margin-top:${-window.innerWidth/2}px;
+        display:block;
+      `;
+    });
+  }
+}
 
  // ── LISTENER GESTIONE CARICAMENTO CSV ────────────────────────────────
 document.getElementById('roster-csv-input').addEventListener('change', e => {
