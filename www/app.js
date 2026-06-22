@@ -3107,15 +3107,77 @@ function ppTab(tab){
 function closePP(){document.getElementById('pp').style.display='none';document.body.style.overflow='';}
 \u003c/script\u003e`;
 
-  const blob = new Blob([standalonePage], {type:'text/html'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'report_'+(m.opponent||'partita').replace(/[^a-zA-Z0-9\u00C0-\u024F_-]/g,'_')+'_'+(m.date||'').replace(/[^0-9-]/g,'_')+'.html';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast(t('report.exported_ok'));
+  // ── Debug panel ──
+  function showDebugLog(msg) {
+    let panel = document.getElementById('debug-panel');
+    if(!panel) {
+      panel = document.createElement('div');
+      panel.id = 'debug-panel';
+      panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:40vh;overflow-y:auto;background:rgba(0,0,0,0.92);color:#0f0;font-size:11px;font-family:monospace;padding:8px;z-index:999999;border-top:2px solid #0f0';
+      const closeBtn = document.createElement('div');
+      closeBtn.innerHTML = '✕ Chiudi log';
+      closeBtn.style.cssText = 'color:#f00;cursor:pointer;margin-bottom:6px;font-weight:bold';
+      closeBtn.onclick = () => panel.remove();
+      panel.appendChild(closeBtn);
+      document.body.appendChild(panel);
+    }
+    const line = document.createElement('div');
+    line.textContent = new Date().toISOString().slice(11,19) + ' ' + msg;
+    panel.appendChild(line);
+    panel.scrollTop = panel.scrollHeight;
+  }
+
+   const blob = new Blob([standalonePage], {type:'text/html'});
+  const fileName = 'report_'+(m.opponent||'partita').replace(/[^a-zA-Z0-9\u00C0-\u024F_-]/g,'_')+'_'+(m.date||'').replace(/[^0-9-]/g,'_')+'.html';
+
+  showDebugLog('fileName: ' + fileName);
+  showDebugLog('blob size: ' + blob.size);
+  showDebugLog('Capacitor: ' + !!window.Capacitor);
+  showDebugLog('isNative: ' + window.Capacitor?.isNativePlatform?.());
+
+  // Prova Capacitor Filesystem prima (APK), poi fallback web
+    if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    showDebugLog('Usando Capacitor Filesystem');
+    try {
+      const { Filesystem, Directory } = await import('@capacitor/filesystem');
+      showDebugLog('Filesystem importato OK');
+      const reader = new FileReader();
+      reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
+      reader.onloadend = async () => {
+        try {
+          showDebugLog('FileReader completato, scrivo file...');
+          const base64 = reader.result.split(',')[1];
+          const result = await Filesystem.writeFile({
+            path: fileName,
+            data: base64,
+            directory: Directory.Downloads,
+            recursive: true
+          });
+          showDebugLog('File scritto: ' + JSON.stringify(result));
+          toast(t('report.exported_ok') + ' → Download');
+        } catch(e) {
+          showDebugLog('writeFile error: ' + e.message);
+          toast('Errore salvataggio: ' + e.message);
+        }
+      };
+      reader.readAsDataURL(blob);
+    } catch(e) {
+      showDebugLog('import error: ' + e.message);
+      toast('Errore import Filesystem: ' + e.message);
+    }
+  } else {
+    showDebugLog('Usando fallback web');
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement('a');
+    a.href     = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(t('report.exported_ok'));
+  }
 }
+
+
 
 function populateReportSelect() {
   const sel=document.getElementById('report-match-select'), prev=sel.value;
