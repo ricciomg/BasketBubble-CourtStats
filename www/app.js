@@ -3144,40 +3144,57 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
       const reader = new FileReader();
       reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
       reader.onloadend = async () => {
-         try {
+  try {
     showDebugLog('FileReader completato, scrivo file...');
     const base64 = reader.result.split(',')[1];
 
-    const dir = 'EXTERNAL_STORAGE'; // oppure 'DOCUMENTS' se preferisci
-    const subPath = 'BasketBubble/' + fileName;
+    // Prova in ordine: DOCUMENTS → CACHE
+    const candidates = ['DOCUMENTS', 'CACHE'];
+    let written = false;
 
-    // Crea la cartella se non esiste
-    try {
-      await Filesystem.mkdir({
+    for (const dir of candidates) {
+      try {
+        showDebugLog('Provo directory: ' + dir);
+
+        // mkdir BasketBubble dentro la directory scelta
+        try {
+          await Filesystem.mkdir({
         path: 'BasketBubble',
         directory: dir,
         recursive: true
       });
-      showDebugLog('Cartella creata o già esistente');
-    } catch(mkdirErr) {
-      showDebugLog('mkdir (ignorato): ' + mkdirErr.message);
-      // Non bloccare: se esiste già, mkdir lancia eccezione
+      showDebugLog('mkdir OK in ' + dir);
+        } catch (mkErr) {
+          // Esiste già → va bene lo stesso
+          showDebugLog('mkdir skip (' + dir + '): ' + mkErr.message);
+        }
+
+        const result = await Filesystem.writeFile({
+          path: 'BasketBubble/' + fileName,
+          data: base64,
+          directory: dir
+        });
+
+        showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
+        toast(t('report.exported_ok') + ' (' + dir + ')');
+        written = true;
+        break; // successo, esci dal loop
+
+      } catch (writeErr) {
+        showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
+      }
     }
 
-    const result = await Filesystem.writeFile({
-      path: subPath,
-      data: base64,
-      directory: dir,
-      // recursive: true  ← non serve se hai già fatto mkdir
-    });
+    if (!written) {
+      throw new Error('Nessuna directory disponibile');
+    }
 
-    showDebugLog('File scritto: ' + JSON.stringify(result));
-    toast(t('report.exported_ok') + ' → BasketBubble/');
   } catch(e) {
-    showDebugLog('writeFile error: ' + e.message);
+    showDebugLog('Errore finale: ' + e.message);
     toast('Errore salvataggio: ' + e.message);
   }
 };
+
       reader.readAsDataURL(blob);
     } catch(e) {
       showDebugLog('Filesystem error: ' + e.message);
