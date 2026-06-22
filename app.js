@@ -3136,11 +3136,11 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
   showDebugLog('isNative: ' + window.Capacitor?.isNativePlatform?.());
 
   // Prova Capacitor Filesystem prima (APK), poi fallback web
-    if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-    showDebugLog('Usando Capacitor Filesystem');
+      if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    showDebugLog('Usando Capacitor Plugins');
     try {
-      const { Filesystem, Directory } = await import('@capacitor/filesystem');
-      showDebugLog('Filesystem importato OK');
+      const Filesystem = window.Capacitor.Plugins.Filesystem;
+      showDebugLog('Filesystem plugin: ' + !!Filesystem);
       const reader = new FileReader();
       reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
       reader.onloadend = async () => {
@@ -3150,7 +3150,7 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
           const result = await Filesystem.writeFile({
             path: fileName,
             data: base64,
-            directory: Directory.Downloads,
+            directory: 'DOWNLOADS',
             recursive: true
           });
           showDebugLog('File scritto: ' + JSON.stringify(result));
@@ -3162,8 +3162,8 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
       };
       reader.readAsDataURL(blob);
     } catch(e) {
-      showDebugLog('import error: ' + e.message);
-      toast('Errore import Filesystem: ' + e.message);
+      showDebugLog('Filesystem error: ' + e.message);
+      toast('Errore: ' + e.message);
     }
   } else {
     showDebugLog('Usando fallback web');
