@@ -124,8 +124,13 @@ document.getElementById('onboarding-logo').src = 'icons/icon-maskable-512x512.pn
 
 // Listener delegato per click
 document.addEventListener('click', function(e) {
+  console.log('CLICK RICEVUTO', e.target)
   const el = e.target.closest('[data-action]');
   if (!el) return;
+
+    console.log('clicked el:', el);
+    console.log('stat-btn found:', e.target.closest('.stat-btn'));
+
   const action = el.getAttribute('data-action');
 
   // ── Flash visivo sul bottone premuto ──
@@ -3213,7 +3218,7 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
         showDebugLog('FileReader completato, scrivo file...');
         const base64 = reader.result.split(',')[1];
 
-        const candidates = ['EXTERNAL_STORAGE', 'DOCUMENTS', 'CACHE'];
+        const candidates = ['CACHE', 'DOCUMENTS', 'EXTERNAL_STORAGE'];
         let written = false;
 
         for (const dir of candidates) {
@@ -3231,32 +3236,33 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
             }
 
             const result = await Filesystem.writeFile({
-              path: 'BasketBubble/' + fileName,
-              data: base64,
-              directory: dir
-            });
+            path: 'BasketBubble/' + fileName,
+            data: base64,
+            directory: dir
+        });
 
-            showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
+           showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
 
-            // Share sheet per aprire/condividere subito
+          // Share sheet — unico punto di uscita verso l'utente
+          const { Share } = window.Capacitor.Plugins;
+          if (Share) {
             try {
-              const { Share } = window.Capacitor.Plugins;
-              if (Share) {
-                await Share.share({
-                  title: fileName,
-                  url: result.uri,
-                  dialogTitle: 'Condividi report'
-                });
-              } else {
-                toast(t('report.exported_ok') + ' → BasketBubble/');
-              }
+              await Share.share({
+                title: fileName,
+                url: result.uri,
+                dialogTitle: 'Salva o condividi il report'
+              });
             } catch(shareErr) {
+              // Utente ha annullato — file comunque salvato in cache
               showDebugLog('Share annullato: ' + shareErr.message);
-              toast(t('report.exported_ok') + ' → BasketBubble/');
+              toast(t('report.exported_ok'));
             }
+          } else {
+            toast(t('report.exported_ok'));
+          }
 
-            written = true;
-            break;
+written = true;
+break;
           } catch(writeErr) {
             showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
           }
