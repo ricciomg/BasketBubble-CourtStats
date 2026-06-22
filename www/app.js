@@ -3245,21 +3245,25 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
 
           // Share sheet — unico punto di uscita verso l'utente
           const { Share } = window.Capacitor.Plugins;
+          showDebugLog('Share plugin: ' + !!Share); // Debug Share plugin
+
           if (Share) {
-            try {
-              await Share.share({
-                title: fileName,
-                url: result.uri,
-                dialogTitle: 'Salva o condividi il report'
-              });
-            } catch(shareErr) {
-              // Utente ha annullato — file comunque salvato in cache
-              showDebugLog('Share annullato: ' + shareErr.message);
-              toast(t('report.exported_ok'));
-            }
-          } else {
-            toast(t('report.exported_ok'));
-          }
+  try {
+    showDebugLog('Apro share sheet...');
+    await Share.share({
+      title: fileName,
+      url: result.uri,
+      dialogTitle: 'Salva o condividi il report'
+    });
+    showDebugLog('Share completato');
+  } catch(shareErr) {
+    showDebugLog('Share annullato/errore: ' + shareErr.message);
+    toast(t('report.exported_ok'));
+  }
+} else {
+  showDebugLog('Share non disponibile');
+  toast(t('report.exported_ok') + ' → Cache');
+}
 
 written = true;
 break;
