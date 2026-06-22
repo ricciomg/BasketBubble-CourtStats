@@ -4307,8 +4307,7 @@ function renderFoulStrip() {
 }
 
 
-Ecco il codice corretto:
-javascript// ═══ ZOOM MAP ═══
+// ═══ ZOOM MAP ═══
 function openZoomMap(svgContainerId, title) {
   const container = document.getElementById(svgContainerId);
   if(!container) return;
