@@ -4307,7 +4307,8 @@ function renderFoulStrip() {
 }
 
 
-// ═══ ZOOM MAP ═══
+Ecco il codice corretto:
+javascript// ═══ ZOOM MAP ═══
 function openZoomMap(svgContainerId, title) {
   const container = document.getElementById(svgContainerId);
   if(!container) return;
@@ -4326,17 +4327,49 @@ function openZoomMap(svgContainerId, title) {
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = `position:fixed;top:12px;right:12px;color:white;font-size:22px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;z-index:100000`;
 
-  // Handler orientamento: rilancia il lock se il browser lo rilascia
+  // Applica (o rimuove) la rotazione CSS in base all'orientamento corrente
+  const applyMapRotation = () => {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      const w = window.innerHeight;
+      const h = window.innerWidth;
+      clone.style.cssText = `
+        width:${w}px;
+        height:${h}px;
+        transform:rotate(90deg);
+        transform-origin:center center;
+        position:absolute;
+        top:50%;left:50%;
+        margin-left:${-w/2}px;
+        margin-top:${-h/2}px;
+        display:block;
+      `;
+    } else {
+      clone.style.cssText = `
+        width:${window.innerWidth}px;
+        height:${window.innerHeight}px;
+        transform:none;
+        position:absolute;
+        top:0;left:0;
+        display:block;
+      `;
+    }
+    // Reset pinch-to-zoom state per evitare offset errati dopo la rotazione
+    _scale = 1; _tx = 0; _ty = 0;
+  };
+
+  // Handler orientamento: rilancia il lock e ricalcola il CSS
   const _lockLandscape = () => {
-    if(screen.orientation && screen.orientation.lock) {
+    if(screen.orientation?.lock) {
       screen.orientation.lock('landscape').catch(() => {});
     }
+    applyMapRotation();
   };
 
   const close = () => {
     overlay.remove();
     window.removeEventListener('orientationchange', _lockLandscape);
-    if(wasPortrait && screen.orientation && screen.orientation.unlock) {
+    if(wasPortrait && screen.orientation?.unlock) {
       screen.orientation.unlock();
     }
   };
@@ -4404,22 +4437,13 @@ function openZoomMap(svgContainerId, title) {
   // ── Fine pinch-to-zoom ─────────────────────────────────────────
 
   // Forza landscape solo se era portrait
-  if(wasPortrait && screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(() => {
-      // Fallback CSS rotation
-      clone.style.cssText = `
-        width:${window.innerHeight}px;
-        height:${window.innerWidth}px;
-        transform:rotate(90deg);
-        transform-origin:center center;
-        position:absolute;
-        top:50%;left:50%;
-        margin-left:${-window.innerHeight/2}px;
-        margin-top:${-window.innerWidth/2}px;
-        display:block;
-      `;
-    });
-    // Rilancia il lock se il sistema lo resetta (es. Capacitor WebView)
+  if (wasPortrait) {
+    if (screen.orientation?.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+    // Applica subito il CSS corretto (indipendentemente dal lock)
+    applyMapRotation();
+    // Aggiorna al cambio di orientamento
     window.addEventListener('orientationchange', _lockLandscape);
   }
 }
