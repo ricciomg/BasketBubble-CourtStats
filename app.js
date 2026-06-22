@@ -3175,8 +3175,24 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
           directory: dir
         });
 
-        showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
-        toast(t('report.exported_ok') + ' (' + dir + ')');
+        // ── Share sheet ──
+        try {
+          const { Share } = window.Capacitor.Plugins;
+          if (Share) {
+            await Share.share({
+              title: fileName,
+              url: result.uri,
+              dialogTitle: 'Condividi report'
+            });
+          } else {
+            toast(t('report.exported_ok') + ' → Documents/BasketBubble/');
+          }
+        } catch (shareErr) {
+          // Utente ha annullato → non è un errore
+          showDebugLog('Share annullato: ' + shareErr.message);
+          toast(t('report.exported_ok') + ' → Documents/BasketBubble/');
+        }
+
         written = true;
         break; // successo, esci dal loop
 
