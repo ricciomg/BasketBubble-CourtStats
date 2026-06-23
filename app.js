@@ -2425,13 +2425,8 @@ function openExpZoomMap() {
   const svg = document.getElementById('exp-svg');
   if (!svg) return;
   const clone = svg.cloneNode(true);
-  const wasPortrait = window.innerHeight > window.innerWidth;
 
-  if (wasPortrait) {
-    clone.style.cssText = 'width:100vh;height:100vw;max-width:100vh;transform:rotate(90deg);display:block';
-  } else {
-    clone.style.cssText = 'width:95vw;height:auto;display:block';
-  }
+  clone.style.cssText = 'width:95vw;height:auto;display:block';
 
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out';
@@ -2440,19 +2435,7 @@ function openExpZoomMap() {
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = 'position:fixed;top:16px;right:16px;color:white;font-size:24px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.15);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;z-index:100000';
 
-  const _lockLandscape = () => {
-    if(screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-  };
-
-  const close = () => {
-    overlay.remove();
-    window.removeEventListener('orientationchange', _lockLandscape);
-    if(wasPortrait && screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-  };
+  const close = () => overlay.remove();
 
   overlay.addEventListener('click', close);
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
@@ -2460,11 +2443,6 @@ function openExpZoomMap() {
   overlay.appendChild(clone);
   overlay.appendChild(closeBtn);
   document.body.appendChild(overlay);
-
-  if(wasPortrait && screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(() => {});
-    window.addEventListener('orientationchange', _lockLandscape);
-  }
 }
 
 // Populate player select
@@ -4315,8 +4293,6 @@ function openZoomMap(svgContainerId, title) {
   if(!svgEl) return;
   const clone = svgEl.cloneNode(true);
 
-  const wasPortrait = window.innerHeight > window.innerWidth;
-
   clone.style.cssText = `width:100%;height:100%;display:block;object-fit:contain`;
 
   const overlay = document.createElement('div');
@@ -4326,52 +4302,7 @@ function openZoomMap(svgContainerId, title) {
   closeBtn.innerHTML = '✕';
   closeBtn.style.cssText = `position:fixed;top:12px;right:12px;color:white;font-size:22px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;z-index:100000`;
 
-  // Applica (o rimuove) la rotazione CSS in base all'orientamento corrente
-  const applyMapRotation = () => {
-    const isPortrait = window.innerHeight > window.innerWidth;
-    if (isPortrait) {
-      const w = window.innerHeight;
-      const h = window.innerWidth;
-      clone.style.cssText = `
-        width:${w}px;
-        height:${h}px;
-        transform:rotate(90deg);
-        transform-origin:center center;
-        position:absolute;
-        top:50%;left:50%;
-        margin-left:${-w/2}px;
-        margin-top:${-h/2}px;
-        display:block;
-      `;
-    } else {
-      clone.style.cssText = `
-        width:${window.innerWidth}px;
-        height:${window.innerHeight}px;
-        transform:none;
-        position:absolute;
-        top:0;left:0;
-        display:block;
-      `;
-    }
-    // Reset pinch-to-zoom state per evitare offset errati dopo la rotazione
-    _scale = 1; _tx = 0; _ty = 0;
-  };
-
-  // Handler orientamento: rilancia il lock e ricalcola il CSS
-  const _lockLandscape = () => {
-    if(screen.orientation?.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-    applyMapRotation();
-  };
-
-  const close = () => {
-    overlay.remove();
-    window.removeEventListener('orientationchange', _lockLandscape);
-    if(wasPortrait && screen.orientation?.unlock) {
-      screen.orientation.unlock();
-    }
-  };
+  const close = () => overlay.remove();
 
   overlay.addEventListener('click', close);
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
@@ -4420,6 +4351,7 @@ function openZoomMap(svgContainerId, title) {
       _scale = newScale; _lastDist = dist;
       _startMidX = mid.x; _startMidY = mid.y;
       _startTx = _tx;     _startTy = _ty;
+      _startTx = _tx;     _startTy = _ty;
       _applyTransform();
     }
   }, { passive: false });
@@ -4434,17 +4366,6 @@ function openZoomMap(svgContainerId, title) {
     }
   });
   // ── Fine pinch-to-zoom ─────────────────────────────────────────
-
-  // Forza landscape solo se era portrait
-  if (wasPortrait) {
-    if (screen.orientation?.lock) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
-    // Applica subito il CSS corretto (indipendentemente dal lock)
-    applyMapRotation();
-    // Aggiorna al cambio di orientamento
-    window.addEventListener('orientationchange', _lockLandscape);
-  }
 }
 
  // ── LISTENER GESTIONE CARICAMENTO CSV ────────────────────────────────
