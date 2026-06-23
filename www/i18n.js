@@ -238,7 +238,8 @@ const STRINGS = {
   'report.select_match':      { it: '— Seleziona partita —', en: '— Select match —' },
   'report.no_matches':        { it: 'Nessuna partita disponibile',
                                 en: 'No matches available'                        },
-  'report.export_btn':        { it: '📤 Esporta',          en: '📤 Export'       },
+  //'report.export_btn':        { it: '📤 Esporta',          en: '📤 Export'       },
+  'report.export_btn':    { it: '📤 Condividi report', en: '📤 Share report' },
   'report.all_periods':       { it: 'Tutti i periodi',     en: 'All periods'     },
   'report.shot_map':          { it: 'MAPPA TIRI',          en: 'SHOT MAP'        },
   'report.zoom_map':          { it: '🔍 Zoom mappa',       en: '🔍 Zoom map'     },
@@ -662,7 +663,6 @@ const STRINGS = {
   'report.action.close':   { it: 'Chiudi',      en: 'Close'         },
   'match.result.win':  { it: 'VITTORIA', en: 'WIN' },
   'match.result.loss': { it: 'SCONFITTA', en: 'LOSS' },
-
 
   // ─── FILTERS ──────────────────────────────────────────────────────
   'filter.all_players':       { it: 'Tutta la squadra',     en: 'All players'          },

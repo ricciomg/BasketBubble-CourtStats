@@ -808,6 +808,12 @@ function applyI18n() {
     else if (html === 'true') { el.innerHTML = val; }
     else { el.textContent = val; }
   });
+
+  // Aggiorna attributo title
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-title'));
+  });
+
    // Aggiorna le <option> con data-i18n
   document.querySelectorAll('option[data-i18n]').forEach(el => {
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -2257,7 +2263,7 @@ async function exportReport() {
   .periods{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;margin:12px 0}
   .periods > *{margin:4px}
   .period{background:#1c1c27;border-radius:8px;padding:8px 12px;text-align:center;min-width:50px}
-  .period-label{font-size:10px;color:#555;text-transform:uppercase}
+  .period-label{font-size:10px;color:#888;text-transform:uppercase}
   .period-pts{font-size:24px;font-weight:700;color:#f5a623}
   .scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid #1c1c27;margin-bottom:16px}
   table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;margin:0}
@@ -2315,7 +2321,7 @@ ${appLogo ? `<img src="${appLogo}" class="app-logo-fixed"
 
 <div class="score">${parseInt(m.ourScore)||0} — ${parseInt(m.oppScore)||0}</div>
 <div class="periods">
-  ${ptotals.map(({label,pts,opp})=>`<div class="period"><div class="period-label">${esc(label)}</div><div class="period-pts">${parseInt(pts)||0}<span style="color:#555;font-size:16px"> — </span><span style="color:#888">${parseInt(opp)||0}</span></div></div>`).join('')}
+  ${ptotals.map(({label,pts,opp})=>`<div class="period"><div class="period-label">${esc(label)}</div><div class="period-pts">${parseInt(pts)||0}<span style="color:#888;font-size:16px"> — </span><span style="color:#888">${parseInt(opp)||0}</span></div></div>`).join('')}
 </div>
 
 <h2>${t('report.box_score')}</h2>
@@ -2387,7 +2393,7 @@ ${renderTeamTotalsHTML(rows, 'export')}
    'player.pts_label':     ${JSON.stringify(t('player.pts_label'))},
    'legend_made':   ${JSON.stringify(t('court.legend_made'))},
    'legend_missed': ${JSON.stringify(t('court.legend_missed'))},
-   'no_shots':      ${JSON.stringify(t('misc.no_shots'))},
+   'misc.no_shots':      ${JSON.stringify(t('misc.no_shots'))},
    'filter.all':       ${JSON.stringify(t('filter.all'))},
    'filter.all_players': ${JSON.stringify(t('filter.all_players'))},
    'court.legend_made':   ${JSON.stringify(t('court.legend_made'))},
@@ -2780,7 +2786,7 @@ document.getElementById('exp-legend').innerHTML =
   '</div>'+
   '<div style="display:flex;justify-content:center;align-items:center;padding:2px 0 6px">'+
   '<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'+
-  '<span style="font-size:9px;color:#555;margin-left:6px">0% → 100%</span>'+
+  '<span style="font-size:9px;color:#888;margin-left:6px">0% → 100%</span>'+
   '</div>'+
   '<div style="text-align:center;padding:2px 0 4px">'+
   '<span style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</span>'+
@@ -2983,7 +2989,7 @@ function jerseysvg(num) {
   sortTable();
 })();
 <\/script>
-` : '<p style="color:#555;font-size:13px;padding:4px 0 16px">Nessun dato quintetti disponibile (richiede tracciamento live).</p>'}
+` : '<p style="color:#888;font-size:13px;padding:4px 0 16px">Nessun dato quintetti disponibile (richiede tracciamento live).</p>'}
 
 
 ${renderSubstitutionsHTML(m, 'export')}
@@ -3119,9 +3125,10 @@ function showPlayer(pid) {
   }
 
   // Pill style
-  const pillS='display:inline-flex;flex:1;flex-direction:column;align-items:center;background:#1c1c27;border:1px solid #333;border-radius:10px;padding:8px 14px;min-width:60px';
+  // fallo come pill separato const pillS='display:inline-flex;flex:1;flex-direction:column;align-items:center;background:#1c1c27;border:1px solid #333;border-radius:10px;padding:8px 14px;min-width:60px';
+  const pillS='display:flex;flex-direction:column;align-items:center;background:#1c1c27;border:1px solid #333;border-radius:10px;padding:8px;text-align:center';
   const pillV='font-size:22px;font-weight:900;color:#f5a623;line-height:1';
-  const pillL='font-size:9px;color:#555;text-transform:uppercase;margin-top:3px';
+  const pillL='font-size:9px;color:#888;text-transform:uppercase;margin-top:3px';
 
   // Shooting breakdown
   const shootS='background:#1c1c27;border:1px solid #333;border-radius:10px;padding:12px;margin:0 0 14px';
@@ -3143,7 +3150,8 @@ function showPlayer(pid) {
 
   document.getElementById('pp-body').innerHTML=
     // ── Pills ──
-    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:0">'
+    //--fallo come pill separato '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:0">'
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+pts+'</div><div style="'+pillL+'">'+t('player.pts_label')+'</div></div>'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+min+'</div><div style="'+pillL+'">'+t('player.min_label')+'</div></div>'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+reb+'</div><div style="'+pillL+'">'+t('player.reb_label')+'</div></div>'
@@ -3154,15 +3162,15 @@ function showPlayer(pid) {
 
     // ── Shooting breakdown ──
     +'<div style="'+shootS+'">'
-    +'<div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+t('player.shots_label')+'</div>'
+    +'<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+t('player.shots_label')+'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">'
-    +'<div><div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:4px">'+t('player.2pt_label')+'</div>'
+    +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.2pt_label')+'</div>'
     +'<div style="font-size:22px;font-weight:900;color:#4a9eff;line-height:1">'+fg2m+'/'+fg2a+'</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+pC(fg2p)+'">'+fg2p+'%</div></div>'
-    +'<div><div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:4px">'+t('player.3pt_label')+'</div>'
+    +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.3pt_label')+'</div>'
     +'<div style="font-size:22px;font-weight:900;color:#e8390e;line-height:1">'+fg3m+'/'+fg3a+'</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+pC(fg3p)+'">'+fg3p+'%</div></div>'
-    +'<div><div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:4px">'+t('player.ft_label')+'</div>'
+    +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.ft_label')+'</div>'
     +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+ftm+'/'+fta+'</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+pC(ftp)+'">'+ftp+'%</div></div>'
     +'</div></div>'
@@ -3171,10 +3179,10 @@ function showPlayer(pid) {
     +(valExp!==null||pmExp!==null
       ? '<div style="display:grid;grid-template-columns:1fr'+(pmExp!==null?' 1fr':'')+';gap:10px;margin-bottom:14px">'
         +(valExp!==null?'<div style="background:#1c1c27;border:1px solid #333;border-radius:10px;padding:12px;text-align:center">'
-          +'<div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+t('player.val_label')+'</div>'
+          +'<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+t('player.val_label')+'</div>'
           +'<div style="font-size:28px;font-weight:900;color:'+(valExp>0?'#2ecc71':valExp<0?'#e74c3c':'#888')+';line-height:1">'+(valExp>0?'+':'')+valExp+'</div></div>':'')
         +(pmExp!==null?'<div style="background:#1c1c27;border:1px solid #333;border-radius:10px;padding:12px;text-align:center">'
-          +'<div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+t('player.pm_label')+'</div>'
+          +'<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+t('player.pm_label')+'</div>'
           +'<div style="font-size:28px;font-weight:900;color:'+(pmExp>0?'#2ecc71':pmExp<0?'#e74c3c':'#888')+';line-height:1">'+(pmExp>0?'+':'')+pmExp+'</div></div>':'')
         +'</div>'
       : '')
@@ -3214,7 +3222,7 @@ function showPlayer(pid) {
         +'</tr>';
     });
     if(!pRows) return '';
-    return '<div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px">'+t('report.by_quarter').toUpperCase()+'</div>'
+    return '<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px">'+t('report.by_quarter').toUpperCase()+'</div>'
       +'<div style="overflow-x:auto;border-radius:10px;border:1px solid #1c1c27;margin-bottom:14px">'
       +'<table style="width:100%;border-collapse:separate;border-spacing:0;font-size:11px">'
       +'<thead><tr>'
@@ -3240,7 +3248,7 @@ function showPlayer(pid) {
 
     // ── Mappa tiri ──
     +(shots.length>0
-      ? '<div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'+t('report.shot_map').toUpperCase()+'</div>'
+      ? '<div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">'+t('report.shot_map').toUpperCase()+'</div>'
         // Period filter
         +(periodBtns?'<div id="pp-period-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">'+periodBtns+'</div>':'')
         // Tab switcher
@@ -3265,7 +3273,7 @@ function showPlayer(pid) {
         +'<span style="color:#e74c3c">● '+t('court.legend_missed')+'</span>'
         +'<span style="color:#888">'+madeInit+'/'+totInit+' — '+pctInit+'%</span>'
         +'</div>'
-        +'<div style="padding:4px 12px 8px;background:#1c1c27;text-align:center"><span style="font-size:10px;color:#555">🔍 '+t('report.shotmap.zoom_hint')+'</span></div>'
+        +'<div style="padding:4px 12px 8px;background:#1c1c27;text-align:center"><span style="font-size:10px;color:#888">🔍 '+t('report.shotmap.zoom_hint')+'</span></div>'
         +'</div></div>'
         // Bubble view
         +'<div id="pp-bubble" style="display:none">'
@@ -3283,11 +3291,11 @@ function showPlayer(pid) {
         +'</div>'
         +'<div style="display:flex;padding:4px 16px 4px;background:#1c1c27;justify-content:center;align-items:center">'
         +'<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'
-        +'<div style="font-size:9px;color:#555;margin-left:6px">'+t('shotmap.bubble.gradient')+'</div>'
+        +'<div style="font-size:9px;color:#888;margin-left:6px">'+t('shotmap.bubble.gradient')+'</div>'
         +'</div>'
-        +'<div style="padding:4px 12px 8px;background:#1c1c27;text-align:center"><span style="font-size:10px;color:#555">🔍 '+t('report.shotmap.zoom_hint')+'</span></div>'
+        +'<div style="padding:4px 12px 8px;background:#1c1c27;text-align:center"><span style="font-size:10px;color:#888">🔍 '+t('report.shotmap.zoom_hint')+'</span></div>'
         +'</div></div>'
-      : '<div style="color:#555;text-align:center;padding:20px">'+t('misc.no_shots')+'</div>');
+      : '<div style="color:#888;text-align:center;padding:20px">'+t('misc.no_shots')+'</div>');
 
   document.getElementById('pp').style.display='block';
   document.body.style.overflow='hidden';
@@ -3609,7 +3617,9 @@ function renderReport() {
         </div>
         <div style="text-align:right">
           <div style="font-family:var(--font-display);font-size:36px;letter-spacing:3px;color:${m.ourScore>m.oppScore?'var(--green)':'var(--red)'}">${parseInt(m.ourScore)||0}<span style="font-size:20px;color:var(--text3)"> — </span>${parseInt(m.oppScore)||0}</div>
-		  <span class="badge ${m.ourScore>m.oppScore?'badge-green':'badge-red'}">${m.ourScore>m.oppScore?t('match.result.win'):t('match.result.loss')}</span>
+		        <span class="badge ${m.status==='live' ? 'badge-orange' : m.ourScore>m.oppScore ? 'badge-green' : 'badge-red'}">
+            ${m.status==='live' ? t('matches.status_live') : m.ourScore>m.oppScore ? t('match.result.win') : t('match.result.loss')}
+            </span>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(${ptotals.length},1fr);gap:6px;margin-top:14px">
@@ -4736,7 +4746,8 @@ function openPlayerModal(matchId, playerId) {
 
   document.getElementById('pd-body').innerHTML = `
     <!-- Pills -->
-    <div style="padding:14px 16px 10px;display:flex;gap:8px;flex-wrap:wrap">
+    // fallo come pill separato <div style="padding:14px 16px 10px;display:flex;gap:8px;flex-wrap:wrap">
+     <div style="padding:14px 16px 10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">  
       <div class="pd-pill"><div class="pd-pill-val">${pts}</div><div class="pd-pill-lbl">${t('player.pts_label')}</div></div>
       <div class="pd-pill"><div class="pd-pill-val">${min}'</div><div class="pd-pill-lbl">${t('player.min_label')}</div></div>
       <div class="pd-pill"><div class="pd-pill-val">${all.reb_off+all.reb_def}</div><div class="pd-pill-lbl">${t('player.reb_label')}</div></div>
