@@ -2384,16 +2384,48 @@ ${renderTeamTotalsHTML(rows, 'export')}
 \u003cscript\u003e   // qui inizia lo script
  // FIX MODALE PALERY IN REPORT ESPORTATO
  const _i18n = {
-    pts_label:     ${JSON.stringify(t('player.pts_label'))},
-    legend_made:   ${JSON.stringify(t('court.legend_made'))},
-    legend_missed: ${JSON.stringify(t('court.legend_missed'))},
-    no_shots:      ${JSON.stringify(t('misc.no_shots'))},
+   'player.pts_label':     ${JSON.stringify(t('player.pts_label'))},
+   'legend_made':   ${JSON.stringify(t('court.legend_made'))},
+   'legend_missed': ${JSON.stringify(t('court.legend_missed'))},
+   'no_shots':      ${JSON.stringify(t('misc.no_shots'))},
    'filter.all':       ${JSON.stringify(t('filter.all'))},
    'filter.all_players': ${JSON.stringify(t('filter.all_players'))},
    'court.legend_made':   ${JSON.stringify(t('court.legend_made'))},
    'court.legend_missed': ${JSON.stringify(t('court.legend_missed'))},
    'report.tab.zone_bubbles':  ${JSON.stringify(t('report.tab.zone_bubbles'))},
    'report.tab.precise_shots': ${JSON.stringify(t('report.tab.precise_shots'))},
+   'player.min_label': ${JSON.stringify(t('player.min_label'))},
+   'player.reb_label': ${JSON.stringify(t('player.reb_label'))},
+   'player.ast_label': ${JSON.stringify(t('player.ast_label'))},
+   'player.stl_label': ${JSON.stringify(t('player.stl_label'))},
+   'player.fls_label': ${JSON.stringify(t('player.fls_label'))},
+   'player.val_label': ${JSON.stringify(t('player.val_label'))},
+   'player.pm_label': ${JSON.stringify(t('player.pm_label'))},
+   'player.shots_label': ${JSON.stringify(t('player.shots_label'))},
+   'player.2pt_label': ${JSON.stringify(t('player.2pt_label'))},
+   'player.3pt_label': ${JSON.stringify(t('player.3pt_label'))},
+   'player.ft_label': ${JSON.stringify(t('player.ft_label'))},
+   'report.shot_map': ${JSON.stringify(t('report.shot_map'))},
+   'report.shotmap.zoom_hint' : ${JSON.stringify(t('report.shotmap.zoom_hint'))},
+   'shotmap.bubble.legend' : ${JSON.stringify(t('shotmap.bubble.legend'))},
+   'shotmap.bubble.gradient' : ${JSON.stringify(t('shotmap.bubble.gradient'))},
+   'report.shot_map':     ${JSON.stringify(t('report.shot_map'))},
+'report.by_quarter':   ${JSON.stringify(t('report.by_quarter'))},
+'col.quarter':         ${JSON.stringify(t('col.quarter'))},
+'col.min':             ${JSON.stringify(t('col.min'))},
+'col.pts':             ${JSON.stringify(t('col.pts'))},
+'col.fg2':             ${JSON.stringify(t('col.fg2'))},
+'col.fg3':             ${JSON.stringify(t('col.fg3'))},
+'col.ft':              ${JSON.stringify(t('col.ft'))},
+'col.reb_off':         ${JSON.stringify(t('col.reb_off'))},
+'col.reb_def':         ${JSON.stringify(t('col.reb_def'))},
+'col.ast':             ${JSON.stringify(t('col.ast'))},
+'col.stl':             ${JSON.stringify(t('col.stl'))},
+'col.tov':             ${JSON.stringify(t('col.tov'))},
+'col.foul':            ${JSON.stringify(t('col.foul'))},
+'col.foul_drawn':      ${JSON.stringify(t('col.foul_drawn'))},
+'col.block':           ${JSON.stringify(t('col.block'))},
+'col.block_against':   ${JSON.stringify(t('col.block_against'))},
   };
 function t(k){ return _i18n[k] || k; }
 const _players = ${playerShotData};
@@ -2556,7 +2588,7 @@ function updateExportBoxScore() {
       pmCell = '<td data-sort="'+pm+'" style="font-weight:700;color:'+pmColor+'">'+(pm>0?'+':'')+pm+'</td>';
     }
     return '<tr>'
-    +'<td style="cursor:pointer;color:#f5a623" data-showplayer="'+p.id+'" data-sort="'+p.num+'">#'+p.num+' '+p.name+' ›</td>'
+    +'<td style="cursor:pointer;color:#f5a623" data-showplayer="'+p.id+'" data-sort="'+p.num+'">#'+p.num+' '+p.name+' &rsaquo;</td>'
     +'<td data-sort="'+min+'">'+min+"'</td>"
     +'<td data-sort="'+pts+'"><strong style="color:#f5a623">'+pts+'</strong></td>'
     +'<td data-sort="'+(s.fg2a>0?Math.round(s.fg2m/s.fg2a*100):-1)+'">'+s.fg2m+'/'+s.fg2a+'<br><span class="dim">'+fg2pct+'%</span></td>'
@@ -3087,7 +3119,7 @@ function showPlayer(pid) {
   }
 
   // Pill style
-  const pillS='display:inline-flex;flex-direction:column;align-items:center;background:#1c1c27;border:1px solid #333;border-radius:10px;padding:8px 14px;min-width:60px';
+  const pillS='display:inline-flex;flex:1;flex-direction:column;align-items:center;background:#1c1c27;border:1px solid #333;border-radius:10px;padding:8px 14px;min-width:60px';
   const pillV='font-size:22px;font-weight:900;color:#f5a623;line-height:1';
   const pillL='font-size:9px;color:#555;text-transform:uppercase;margin-top:3px';
 
@@ -3113,7 +3145,7 @@ function showPlayer(pid) {
     // ── Pills ──
     '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:0">'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+pts+'</div><div style="'+pillL+'">'+t('player.pts_label')+'</div></div>'
-    +'<div style="'+pillS+'"><div style="'+pillV+'">'+min+"'</div><div style=\""+pillL+'">'+t('player.min_label')+'</div></div>'
+    +'<div style="'+pillS+'"><div style="'+pillV+'">'+min+'</div><div style="'+pillL+'">'+t('player.min_label')+'</div></div>'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+reb+'</div><div style="'+pillL+'">'+t('player.reb_label')+'</div></div>'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+ast+'</div><div style="'+pillL+'">'+t('player.ast_label')+'</div></div>'
     +'<div style="'+pillS+'"><div style="'+pillV+'">'+stl+'</div><div style="'+pillL+'">'+t('player.stl_label')+'</div></div>'
@@ -3146,6 +3178,65 @@ function showPlayer(pid) {
           +'<div style="font-size:28px;font-weight:900;color:'+(pmExp>0?'#2ecc71':pmExp<0?'#e74c3c':'#888')+';line-height:1">'+(pmExp>0?'+':'')+pmExp+'</div></div>':'')
         +'</div>'
       : '')
+
+  // ── By Quarter ──
+  + (periodKeys.length > 0 ? (function(){
+    const keys = periodKeys;
+    let pRows = '';
+    keys.forEach(function(k){
+      const s = p.byPeriod ? (p.byPeriod[k] || null) : null;
+      // recupera byPeriod dal _matchStats
+      const ms = _matchStats.players.find(function(x){ return String(x.id)===String(p.id); });
+      const sd = ms ? (ms.byPeriod[k] || null) : null;
+      if(!sd) return;
+      const pts2 = (sd.fg2m||0)*2 + (sd.fg3m||0)*3 + (sd.ftm||0);
+      const fg2pct = sd.fg2a>0 ? Math.round(sd.fg2m/sd.fg2a*100) : 0;
+      const fg3pct = sd.fg3a>0 ? Math.round(sd.fg3m/sd.fg3a*100) : 0;
+      const ftpct  = sd.fta>0  ? Math.round(sd.ftm/sd.fta*100)   : 0;
+      const min    = Math.round(sd.minPlayed||0);
+      const label  = k.startsWith('q') ? 'Q'+k.slice(1) : 'OT'+k.slice(2);
+      pRows += '<tr>'
+        +'<td style="text-align:left;font-weight:700;color:#f5a623">'+label+'</td>'
+        +'<td>'+min+"'</td>"
+        +'<td><strong style="color:#f5a623">'+pts2+'</strong></td>'
+        +'<td>'+sd.fg2m+'/'+sd.fg2a+'<br><span style="font-size:9px;color:#aaa">'+fg2pct+'%</span></td>'
+        +'<td>'+sd.fg3m+'/'+sd.fg3a+'<br><span style="font-size:9px;color:#aaa">'+fg3pct+'%</span></td>'
+        +'<td>'+sd.ftm+'/'+sd.fta+'<br><span style="font-size:9px;color:#aaa">'+ftpct+'%</span></td>'
+        +'<td>'+(sd.reb_off||0)+'</td>'
+        +'<td>'+(sd.reb_def||0)+'</td>'
+        +'<td>'+(sd.assist||0)+'</td>'
+        +'<td>'+(sd.steal||0)+'</td>'
+        +'<td>'+(sd.turnover||0)+'</td>'
+        +'<td>'+(sd.foul||0)+'</td>'
+        +'<td>'+(sd.foul_drawn||0)+'</td>'
+        +'<td>'+(sd.block||0)+'</td>'
+        +'<td>'+(sd.block_against||0)+'</td>'
+        +'</tr>';
+    });
+    if(!pRows) return '';
+    return '<div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px">'+t('report.by_quarter').toUpperCase()+'</div>'
+      +'<div style="overflow-x:auto;border-radius:10px;border:1px solid #1c1c27;margin-bottom:14px">'
+      +'<table style="width:100%;border-collapse:separate;border-spacing:0;font-size:11px">'
+      +'<thead><tr>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.quarter')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.min')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.pts')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.fg2')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.fg3')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.ft')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.reb_off')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.reb_def')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.ast')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.stl')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.tov')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.foul')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.foul_drawn')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.block')+'</th>'
+      +'<th style="background:#1a1a26;color:#aaa;padding:6px 5px;text-align:center;font-size:10px;text-transform:uppercase;white-space:nowrap">'+t('col.block_against')+'</th>'
+      +'</tr></thead>'
+      +'<tbody>'+pRows+'</tbody>'
+      +'</table></div>';
+  })() : '') 
 
     // ── Mappa tiri ──
     +(shots.length>0
@@ -3188,11 +3279,11 @@ function showPlayer(pid) {
         +'<g id="pp-bubbles-g">'+bubblesInit+'</g>'
         +'</svg>'
         +'<div style="display:flex;gap:10px;padding:7px 12px;background:#1c1c27;justify-content:center;flex-wrap:wrap;align-items:center">'
-        +'<div style="font-size:10px;color:#888">Dimensione = volume tiri · Colore = % realizzazione</div>'
+        +'<div style="font-size:10px;color:#888">'+t('shotmap.bubble.legend')+'</div>'
         +'</div>'
         +'<div style="display:flex;padding:4px 16px 4px;background:#1c1c27;justify-content:center;align-items:center">'
         +'<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'
-        +'<div style="font-size:9px;color:#555;margin-left:6px">0% → 100%</div>'
+        +'<div style="font-size:9px;color:#555;margin-left:6px">'+t('shotmap.bubble.gradient')+'</div>'
         +'</div>'
         +'<div style="padding:4px 12px 8px;background:#1c1c27;text-align:center"><span style="font-size:10px;color:#555">🔍 '+t('report.shotmap.zoom_hint')+'</span></div>'
         +'</div></div>'
@@ -3327,7 +3418,17 @@ function showPlayer(pid) {
     _ppZoomSetup('pp-bubble-wrap','pp-svg-bubble');
   }
 }
-  
+ 
+function ppTab(tab){
+  document.getElementById('pp-dots').style.display=tab==='dots'?'block':'none';
+  document.getElementById('pp-bubble').style.display=tab==='bubble'?'block':'none';
+  document.getElementById('pp-tab-dots').style.background=tab==='dots'?'#f5a623':'transparent';
+  document.getElementById('pp-tab-dots').style.color=tab==='dots'?'#000':'#888';
+  document.getElementById('pp-tab-bubble').style.background=tab==='bubble'?'#f5a623':'transparent';
+  document.getElementById('pp-tab-bubble').style.color=tab==='bubble'?'#000':'#888';
+}
+function closePP(){document.getElementById('pp').style.display='none';document.body.style.overflow='';}
+
 \u003c/script\u003e`;
 
   // ── Debug panel ──
