@@ -242,7 +242,6 @@
 <div id="lang-onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;">
   <div style="background:var(--bg2,#1e2330);border-radius:16px;padding:40px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
     <div style="margin-bottom:12px;">
-    <!--   <img src="" class="app-logo-fixed" alt="BasketBubble" style="max-width:200px;height:auto;"> -->
 	  <img id="onboarding-logo" src="" alt="BasketBubble - CourtStats" style="max-width:200px;height:auto;">
     </div>
     <div style="font-size:14px;color:var(--text3,#8899aa);margin-bottom:32px;">Scegli la lingua / Choose language</div>
@@ -600,7 +599,6 @@
       <div><label data-i18n="modal.newMatch.opp_label">Avversario</label><input id="nm-opponent" placeholder="es. Bulls Milano" data-i18n-placeholder="modal.newMatch.opp_ph"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div><label data-i18n="modal.newMatch.date_label">Data</label><input id="nm-date" type="date"/></div>
-       <!-- <div><label data-i18n="modal.newMatch.venue_label">Casa/Ospiti</label><select id="nm-home"><option value="home" >Casa 🏠</option><option value="away">Ospiti ✈️</option></select></div> -->
         <div><label data-i18n="modal.newMatch.venue_label">Casa/Ospiti</label><select id="nm-home"><option value="home" data-i18n="modal.newMatch.home_opt">Casa 🏠</option><option value="away" data-i18n="modal.newMatch.away_opt">Ospiti ✈️</option></select></div>
 	  </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -770,11 +768,6 @@
 
       <!-- Riga 2 -->
 
- <!--     <polygon class="z3" data-zone="Angolo Sx Alto"
-      points="0,180 0,180 0,180 0,180"
-      data-action="pickZone(event,this)"/>
-      <text class="zone-label" x="50" y="240">Angolo Sx Alto</text> -->
-
       <polygon class="z3" data-zone="Ala Sx"
       points="0,60 200,255 120,345 0,300"
       data-action="pickZone(event,this)"/>
@@ -804,11 +797,6 @@
       points="920,60 920,300 800,345 725,260"
       data-action="pickZone(event,this)"/>
       <text class="zone-label" x="760" y="240">Ala Dx</text>
-
-  <!--      <polygon class="z3" data-zone="Angolo Dx Alto"
-      points="920,60 920,60 920,60 920,60"
-      data-action="pickZone(event,this)"/>
-      <text class="zone-label" x="870" y="240">Angolo Dx Alto</text> -->
 
       <!-- Riga 3 -->
 
@@ -905,9 +893,6 @@
     <div style="display:flex;gap:14px;justify-content:center;margin-top:7px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#2ecc71"><div style="width:10px;height:10px;background:rgba(46,204,113,.4);border:1px solid #2ecc71;border-radius:2px"></div><span data-i18n="log.shot_made">Segnato</span></div> 
       <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#e74c3c"><div style="width:10px;height:10px;background:rgba(232,57,14,.4);border:1px solid #e74c3c;border-radius:2px"></div><span data-i18n="log.shot_missed">Sbagliato</span></div> 
-   <!--   <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green)"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>Segnato</div> -->
-   <!--   <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#2ECC71"><div style="width:10px;height:10px;background:var(--green);border-radius:50%"></div>Segnato</div>     -->  
-   <!--   <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#e74c3c"><div style="width:10px;height:10px;background:var(--red);border-radius:50%"></div>Sbagliato</div>-->
     </div>
   </div>
   <div style="margin-top:12px"><button class="btn btn-ghost" data-action="closeCourtModal()" data-i18n="modal.addPlayer.cancel_btn">Annulla</button></div>

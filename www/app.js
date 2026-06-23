@@ -124,12 +124,12 @@ document.getElementById('onboarding-logo').src = 'icons/icon-maskable-512x512.pn
 
 // Listener delegato per click
 document.addEventListener('click', function(e) {
-  console.log('CLICK RICEVUTO', e.target)
+  //console.log('CLICK RICEVUTO', e.target)
   const el = e.target.closest('[data-action]');
   if (!el) return;
 
-    console.log('clicked el:', el);
-    console.log('stat-btn found:', e.target.closest('.stat-btn'));
+    //console.log('clicked el:', el);
+    //console.log('stat-btn found:', e.target.closest('.stat-btn'));
 
   const action = el.getAttribute('data-action');
 
@@ -659,7 +659,6 @@ async function confirmStarting5() {
   const m=state.matches[liveMatch];
   m.players.forEach(p=>{
     p.onCourt=ids.includes(p.id);
-    // minStart = absolute minutes from match start (0 for Q1 starters)
     p.minStart=ids.includes(p.id)?0:null;
   });
   m.starting5=ids; m.status='live';
@@ -1725,7 +1724,7 @@ function renderTeamTotalsHTML(rows, mode) {
   const cardStyle = mode === 'inapp'
     ? `class="card" style="padding:12px;text-align:center;margin:0"`
     : `style="background:${th.cardBg};border:1px solid ${th.border};border-radius:12px;padding:12px;text-align:center"`;
-  return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 ${mode==='inapp'?'16px':'0'} 16px">
+  return `<div class="grid3-fixed" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 ${mode==='inapp'?'16px':'0'} 16px">
     ${stats.map(s => `<div ${cardStyle}>
       <div style="font-size:18px;margin-bottom:2px">${s.icon}</div>
       <div style="font-size:${mode==='inapp'?'11':'13'}px;color:${th.text2};font-weight:600;letter-spacing:.3px;margin-bottom:4px">${s.label}</div>
@@ -2285,9 +2284,9 @@ async function exportReport() {
   .q-card{background:#13131a;border:1px solid rgba(245,166,35,.12);border-radius:10px;padding:12px;margin-bottom:12px}
   .q-title{font-size:16px;font-weight:700;color:#f5a623;margin-bottom:8px;letter-spacing:1px}
   @media(max-width:480px){
-    div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:repeat(2,1fr) !important}
-    div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr) !important}
-  }
+  div[style*="grid-template-columns:repeat(3,1fr)"]:not(.grid3-fixed){grid-template-columns:repeat(2,1fr) !important}
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr) !important}
+}
 </style>
 </head>
 <body>
@@ -2745,7 +2744,7 @@ function updateExportMap() {
     document.getElementById('exp-svg').querySelector('rect').setAttribute('fill','rgba(0,0,0,0.3)');
 document.getElementById('exp-legend').innerHTML =
   '<div style="display:flex;align-items:center;justify-content:center;padding-bottom:4px">' +
-  '<span style="font-size:10px;color:#888">Dimensione=volume · Colore=% realizzazione</span>' +
+  '<span style="font-size:10px;color:#888">Dimensione=numero tiri · Colore=% realizzazione</span>' +
   '</div>'+
   '<div style="display:flex;justify-content:center;align-items:center;padding:2px 0 6px">'+
   '<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'+
@@ -3106,7 +3105,7 @@ function showPlayer(pid) {
         +bubbles+'</svg>'
         +'<div style="display:flex;flex-direction:column;gap:4px;padding:7px 12px 4px;background:#1c1c27;align-items:center">'
         +'<div style="font-size:10px;color:#888">Dimensione = volume tiri &nbsp;|&nbsp; Colore = % realizzazione</div>'
-        +'<div style="font-size:10px;color:#888;cursor:zoom-in" ondblclick="openExpZoomMap()">🔍 Doppio tap per ingrandire</div>'
+        +'<div id="pp-bubble-zoom-hint" style="font-size:10px;color:#888;cursor:zoom-in">🔍 Doppio tap per ingrandire</div>'
         +'</div>'
         +'<div style="display:flex;padding:4px 16px 8px;background:#1c1c27;justify-content:center;align-items:center">'
         +'<div style="width:80px;height:10px;border-radius:5px;background:linear-gradient(to right,rgba(231,76,60,0.92),rgba(200,180,0,0.35),rgba(46,204,113,0.92))"></div>'
@@ -3118,6 +3117,67 @@ function showPlayer(pid) {
 
   document.getElementById('pp').style.display='block';
   document.body.style.overflow='hidden';
+  // Doppio tap sulla mappa bubble del player modal
+(function() {
+  const hint = document.getElementById('pp-bubble-zoom-hint');
+  const bubbleSvg = document.querySelector('#pp-bubble svg');
+  if (!hint || !bubbleSvg) return;
+
+  let _lastTap = 0;
+  const zoomTarget = bubbleSvg.closest('div[style*="border-radius:12px"]') || bubbleSvg;
+
+  zoomTarget.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - _lastTap < 300) {
+      e.preventDefault();
+      // Apri overlay con clone della SVG bubble
+      const clone = bubbleSvg.cloneNode(true);
+      clone.style.cssText = 'width:95vw;height:auto;display:block';
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:999999;display:flex;align-items:center;justify-content:center;overflow:hidden';
+
+      const closeBtn = document.createElement('div');
+      closeBtn.innerHTML = '✕';
+      closeBtn.style.cssText = 'position:fixed;top:12px;right:12px;color:white;font-size:22px;font-weight:bold;cursor:pointer;background:rgba(255,255,255,0.2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;z-index:1000000';
+
+      const close = () => overlay.remove();
+      overlay.addEventListener('click', close);
+      closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+
+      overlay.appendChild(clone);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+
+      // Pinch-to-zoom
+      let _scale = 1, _lastDist = 0, _tx = 0, _ty = 0;
+      let _startTx = 0, _startTy = 0, _startMidX = 0, _startMidY = 0;
+      const _getDist = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+      const _getMid  = t => ({ x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2 });
+      const _applyT  = () => { clone.style.transform='translate('+_tx+'px,'+_ty+'px) scale('+_scale+')'; clone.style.transformOrigin='0 0'; };
+
+      overlay.addEventListener('touchstart', (e) => {
+        if(e.touches.length===2){ e.preventDefault(); _lastDist=_getDist(e.touches); const m=_getMid(e.touches); _startMidX=m.x;_startMidY=m.y;_startTx=_tx;_startTy=_ty; }
+      }, {passive:false});
+      overlay.addEventListener('touchmove', (e) => {
+        if(e.touches.length===2){ e.preventDefault();
+          const dist=_getDist(e.touches), ratio=dist/_lastDist;
+          const ns=Math.min(Math.max(_scale*ratio,1),5);
+          const m=_getMid(e.touches);
+          _tx=m.x-((_startMidX-_startTx)*(ns/_scale));
+          _ty=m.y-((_startMidY-_startTy)*(ns/_scale));
+          _scale=ns;_lastDist=dist;_startMidX=m.x;_startMidY=m.y;_startTx=_tx;_startTy=_ty;
+          _applyT();
+        }
+      }, {passive:false});
+      let _lt=0;
+      overlay.addEventListener('touchend', (e) => {
+        if(e.touches.length===0){ const n=Date.now(); if(n-_lt<300){_scale=1;_tx=0;_ty=0;_applyT();} _lt=n; }
+      });
+    }
+    _lastTap = now;
+  });
+})();
 }
 function ppTab(tab){
   document.getElementById('pp-dots').style.display=tab==='dots'?'block':'none';
@@ -3153,14 +3213,14 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
    const blob = new Blob([standalonePage], {type:'text/html'});
    const fileName = 'report_'+(m.opponent||'partita').replace(/[^a-zA-Z0-9\u00C0-\u024F_-]/g,'_')+'_'+(m.date||'').replace(/[^0-9-]/g,'_')+'.html';
 
-  showDebugLog('fileName: ' + fileName);
-  showDebugLog('blob size: ' + blob.size);
-  showDebugLog('Capacitor: ' + !!window.Capacitor);
-  showDebugLog('isNative: ' + window.Capacitor?.isNativePlatform?.());
+  //showDebugLog('fileName: ' + fileName);
+  //showDebugLog('blob size: ' + blob.size);
+  //showDebugLog('Capacitor: ' + !!window.Capacitor);
+  //showDebugLog('isNative: ' + window.Capacitor?.isNativePlatform?.());
 
   // Prova Capacitor Filesystem prima (APK), poi fallback web
       if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-  showDebugLog('Usando Capacitor Plugins');
+  //showDebugLog('Usando Capacitor Plugins');
   try {
     const Filesystem  = window.Capacitor.Plugins.Filesystem;
     const Permissions = window.Capacitor.Plugins.Permissions;
@@ -3169,14 +3229,14 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
     if (Permissions) {
       try {
         const check = await Permissions.checkPermissions();
-        showDebugLog('Perm check: ' + JSON.stringify(check));
+        //showDebugLog('Perm check: ' + JSON.stringify(check));
         const needRequest = check.publicStorage !== 'granted'
                          && check.storage      !== 'granted';
         if (needRequest) {
           const req = await Permissions.requestPermissions({
             permissions: ['storage', 'publicStorage']
           });
-          showDebugLog('Perm request: ' + JSON.stringify(req));
+          //showDebugLog('Perm request: ' + JSON.stringify(req));
           const denied = req.storage      === 'denied'
                       && req.publicStorage === 'denied';
           if (denied) {
@@ -3185,15 +3245,17 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
           }
         }
       } catch(permErr) {
-        showDebugLog('Perm error (ignoro): ' + permErr.message);
+        //showDebugLog('Perm error (ignoro): ' + permErr.message);
       }
     }
 
     const reader = new FileReader();
-    reader.onerror = (e) => { showDebugLog('FileReader error: ' + e); toast('Errore lettura file'); };
+    reader.onerror = (e) => { 
+      //showDebugLog('FileReader error: ' + e); 
+      toast('Errore lettura file'); };
     reader.onloadend = async () => {
       try {
-        showDebugLog('FileReader completato, scrivo file...');
+        //showDebugLog('FileReader completato, scrivo file...');
         const base64 = reader.result.split(',')[1];
 
         const candidates = ['CACHE', 'DOCUMENTS', 'EXTERNAL_STORAGE'];
@@ -3201,16 +3263,16 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
 
         for (const dir of candidates) {
           try {
-            showDebugLog('Provo directory: ' + dir);
+            //showDebugLog('Provo directory: ' + dir);
             try {
               await Filesystem.mkdir({
                 path: 'BasketBubble',
                 directory: dir,
                 recursive: true
               });
-              showDebugLog('mkdir OK in ' + dir);
+              //showDebugLog('mkdir OK in ' + dir);
             } catch(mkErr) {
-              showDebugLog('mkdir skip (' + dir + '): ' + mkErr.message);
+              //showDebugLog('mkdir skip (' + dir + '): ' + mkErr.message);
             }
 
             const result = await Filesystem.writeFile({
@@ -3219,51 +3281,51 @@ function closePP(){document.getElementById('pp').style.display='none';document.b
             directory: dir
         });
 
-           showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
+           //showDebugLog('Scritto in ' + dir + ': ' + JSON.stringify(result));
 
           // Share sheet — unico punto di uscita verso l'utente
           const { Share } = window.Capacitor.Plugins;
-          showDebugLog('Share plugin: ' + !!Share); // Debug Share plugin
+          //showDebugLog('Share plugin: ' + !!Share); // Debug Share plugin
 
           if (Share) {
   try {
-    showDebugLog('Apro share sheet...');
+    //showDebugLog('Apro share sheet...');
     await Share.share({
       title: fileName,
       url: result.uri,
       dialogTitle: 'Salva o condividi il report'
     });
-    showDebugLog('Share completato');
+    //showDebugLog('Share completato');
   } catch(shareErr) {
-    showDebugLog('Share annullato/errore: ' + shareErr.message);
+    //showDebugLog('Share annullato/errore: ' + shareErr.message);
     toast(t('report.exported_ok'));
   }
 } else {
-  showDebugLog('Share non disponibile');
+  //showDebugLog('Share non disponibile');
   toast(t('report.exported_ok') + ' → Cache');
 }
 
 written = true;
 break;
           } catch(writeErr) {
-            showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
+            //showDebugLog('Fallito ' + dir + ': ' + writeErr.message);
           }
         }
 
         if (!written) throw new Error('Nessuna directory disponibile');
 
       } catch(e) {
-        showDebugLog('Errore finale: ' + e.message);
+        //showDebugLog('Errore finale: ' + e.message);
         toast('Errore salvataggio: ' + e.message);
       }
     };
     reader.readAsDataURL(blob);
   } catch(e) {
-    showDebugLog('Filesystem error: ' + e.message);
+    //showDebugLog('Filesystem error: ' + e.message);
     toast('Errore: ' + e.message);
   }
 } else {
-    showDebugLog('Usando fallback web');
+    //showDebugLog('Usando fallback web');
     const url = URL.createObjectURL(blob);
     const a   = document.createElement('a');
     a.href     = url;
@@ -3733,18 +3795,16 @@ function renderShotMap(m, filterPlayerId, filterPeriod, prefix) {
     'Top Cx-Dx':   {x:520,y:100,rx:50,ry:60},
     'Top Dx':      {x:640,y:120,rx:50,ry:60},
     'Top Ang.Dx':  {x:750,y:170,rx:50,ry:60},
-// ──     'Angolo Sx Alto':{x:50,y:240,rx:50,ry:60},
-	'Angolo Sx Mid':{x:50,y:360,rx:50,ry:60},
-	'Angolo Sx Basso':{x:50,y:480,rx:50,ry:60},
+  	'Angolo Sx Mid':{x:50,y:360,rx:50,ry:60},
+	  'Angolo Sx Basso':{x:50,y:480,rx:50,ry:60},
     'Ala Sx':      {x:90,y:250,rx:50,ry:60},
     'Alto Sx':     {x:280,y:240,rx:50,ry:60},
     'Alto Cx-Sx':  {x:400,y:240,rx:50,ry:60},
     'Alto Cx-Dx':  {x:520,y:240,rx:50,ry:60},
     'Alto Dx':     {x:640,y:240,rx:50,ry:60},
     'Ala Dx':      {x:830,y:250,rx:50,ry:60},
- // ──     'Angolo Dx Alto':{x:871,y:240,rx:51,ry:60},
-	'Angolo Dx Mid':{x:870,y:360,rx:50,ry:60},
-	'Angolo Dx Basso':{x:870,y:480,rx:50,ry:60},
+	  'Angolo Dx Mid':{x:870,y:360,rx:50,ry:60},
+	  'Angolo Dx Basso':{x:870,y:480,rx:50,ry:60},
     'Mid Est Sx':  {x:160,y:360,rx:50,ry:60},
     'Mid Sx':      {x:280,y:360,rx:50,ry:60},
     'Mid Cx-Sx':   {x:400,y:360,rx:50,ry:60},
