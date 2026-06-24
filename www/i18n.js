@@ -120,6 +120,7 @@ const STRINGS = {
   'live.tab_log':             { it: 'LOG',                     en: 'LOG'                   },
   'live.tab_report':          { it: 'REPORT LIVE',             en: 'REPORT LIVE'           },
   'live.oncourt':             { it: 'IN CAMPO',                en: 'ON COURT'              },
+  'live.oncourt.select':      { it: 'In Campo — tocca per selezionare',  en: 'On Court - tap to select'},  
   'live.section_shots':       { it: 'TIRI',                    en: 'SHOTS'                 },
   'live.section_rebounds':    { it: 'RIMBALZI',                en: 'REBOUNDS'              },
   'live.section_misc':        { it: 'ALTRO',                   en: 'OTHER'                 },
@@ -197,6 +198,7 @@ const STRINGS = {
   'modal.timeout.title':    { it: 'TIMEOUT',              en: 'TIMEOUT'         },
   'modal.timeout.our':      { it: 'Nostro Timeout',       en: 'Our Timeout'     },
   'modal.timeout.cancel':   { it: 'Annulla',              en: 'Cancel'          },
+  'modal.timeout.call':     { it: 'Chiama Timeout',       en: 'Call a Timeout'          },
 
   // ─── MODALE ROLLBACK ─────────────────────────────────────────────
   'modal.rollback.title':   { it: 'ANNULLA AZIONE',       en: 'UNDO ACTION'     },

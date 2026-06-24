@@ -4746,7 +4746,7 @@ function openPlayerModal(matchId, playerId) {
 
   document.getElementById('pd-body').innerHTML = `
     <!-- Pills -->
-    // fallo come pill separato <div style="padding:14px 16px 10px;display:flex;gap:8px;flex-wrap:wrap">
+    <!-- fallo come pill separato <div style="padding:14px 16px 10px;display:flex;gap:8px;flex-wrap:wrap"> -->
      <div style="padding:14px 16px 10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">  
       <div class="pd-pill"><div class="pd-pill-val">${pts}</div><div class="pd-pill-lbl">${t('player.pts_label')}</div></div>
       <div class="pd-pill"><div class="pd-pill-val">${min}'</div><div class="pd-pill-lbl">${t('player.min_label')}</div></div>
