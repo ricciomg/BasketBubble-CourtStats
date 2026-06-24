@@ -1684,9 +1684,9 @@ function renderShotSummaryHTML(rows, mode) {
   function pC(v) { return v >= 50 ? th.green : v >= 33 ? th.yellow : th.red; }
   const cards = [
     {label: t('report.shot_fg'),  made: fgm,    att: fga,    pct: fgpct,  col: th.accent},
-    {label: t('report.shot_fg2'), made: T.fg2m, att: T.fg2a, pct: fg2pct, col: '#3498db'},
-    {label: t('report.shot_fg3'), made: T.fg3m, att: T.fg3a, pct: fg3pct, col: '#e8390e'},
-    {label: t('report.shot_ft'),  made: T.ftm,  att: T.fta,  pct: ftpct,  col: '#9b59b6'},
+    {label: t('report.shot_fg2'), made: T.fg2m, att: T.fg2a, pct: fg2pct, col: th.accent},
+    {label: t('report.shot_fg3'), made: T.fg3m, att: T.fg3a, pct: fg3pct, col: th.accent},
+    {label: t('report.shot_ft'),  made: T.ftm,  att: T.fta,  pct: ftpct,  col: th.accent},
   ];
   const grid = mode === 'inapp'
     ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 16px 16px'
@@ -3033,7 +3033,7 @@ function showPlayer(pid) {
   const foul=p.foul||0;
   const min=p.min||0;
 
-  function pC(v){return v>=50?'#2ecc71':v>=33?'#f5a623':'#e74c3c';}
+  function pC(v){return v>=50?'#2ecc71':v>=33?'#f0c030':'#e74c3c';}
 
   // Raccogli i periodi disponibili dai tiri
   const periodKeys=[..._matchStats.periods||[]];
@@ -3165,10 +3165,10 @@ function showPlayer(pid) {
     +'<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+t('player.shots_label')+'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.2pt_label')+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#4a9eff;line-height:1">'+fg2m+'/'+fg2a+'</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+fg2m+'/'+fg2a+'</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+pC(fg2p)+'">'+fg2p+'%</div></div>'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.3pt_label')+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#e8390e;line-height:1">'+fg3m+'/'+fg3a+'</div>'
+    +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+fg3m+'/'+fg3a+'</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+pC(fg3p)+'">'+fg3p+'%</div></div>'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.ft_label')+'</div>'
     +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+ftm+'/'+fta+'</div>'
@@ -3617,7 +3617,7 @@ function renderReport() {
         </div>
         <div style="text-align:right">
           <div style="font-family:var(--font-display);font-size:36px;letter-spacing:3px;color:${m.ourScore>m.oppScore?'var(--green)':'var(--red)'}">${parseInt(m.ourScore)||0}<span style="font-size:20px;color:var(--text3)"> — </span>${parseInt(m.oppScore)||0}</div>
-		        <span class="badge ${m.status==='live' ? 'badge-orange' : m.ourScore>m.oppScore ? 'badge-green' : 'badge-red'}">
+		        <span class="badge ${m.status==='live' ? 'badge-accent' : m.ourScore>m.oppScore ? 'badge-green' : 'badge-red'}">
             ${m.status==='live' ? t('matches.status_live') : m.ourScore>m.oppScore ? t('match.result.win') : t('match.result.loss')}
             </span>
         </div>
@@ -4766,17 +4766,17 @@ function openPlayerModal(matchId, playerId) {
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.2pt_label')}</div>
           <div style="font-family:var(--font-display);font-size:22px;color:var(--blue)">${all.fg2m}/${all.fg2a}</div>
-          <div style="font-size:14px;font-weight:700;color:${fg2pct>=50?'var(--green)':fg2pct>=33?'var(--accent)':'var(--red)'}">${fg2pct}%</div>
+          <div style="font-size:14px;font-weight:700;color:${fg2pct>=50?'var(--green)':fg2pct>=33?'var(--yellow)':'var(--red)'}">${fg2pct}%</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.3pt_label')}</div>
           <div style="font-family:var(--font-display);font-size:22px;color:#e8390e">${all.fg3m}/${all.fg3a}</div>
-          <div style="font-size:14px;font-weight:700;color:${fg3pct>=50?'var(--green)':fg3pct>=33?'var(--accent)':'var(--red)'}">${fg3pct}%</div>
+          <div style="font-size:14px;font-weight:700;color:${fg3pct>=50?'var(--green)':fg3pct>=33?'var(--yellow)':'var(--red)'}">${fg3pct}%</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.ft_label')}</div>
           <div style="font-family:var(--font-display);font-size:22px;color:var(--accent)">${all.ftm}/${all.fta}</div>
-          <div style="font-size:14px;font-weight:700;color:${ftpct>=50?'var(--green)':ftpct>=33?'var(--accent)':'var(--red)'}">${ftpct}%</div>
+          <div style="font-size:14px;font-weight:700;color:${ftpct>=50?'var(--green)':ftpct>=33?'var(--yellow)':'var(--red)'}">${ftpct}%</div>
         </div>
       </div>
     </div>
