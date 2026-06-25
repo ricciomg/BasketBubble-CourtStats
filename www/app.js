@@ -1,3 +1,6 @@
+// ── AdMob plugin (Capacitor) ─────────────────────────────────────
+const isCapacitor = window.Capacitor?.isNativePlatform?.() === true;// permette getione web senza crash. 
+const { AdMob, BannerAdSize, BannerAdPosition } = isCapacitor ? window.Capacitor.Plugins : {};
 
 // ═══════════════════════════════════════════════════════════════════
 // EVENT DELEGATION — sostituisce tutti gli onclick/onchange/oninput
@@ -1681,12 +1684,12 @@ function renderShotSummaryHTML(rows, mode) {
   const ftpct  = T.fta  > 0 ? Math.round(T.ftm  / T.fta  * 100) : 0;
   const fgm = T.fg2m + T.fg3m, fga = T.fg2a + T.fg3a;
   const fgpct = fga > 0 ? Math.round(fgm / fga * 100) : 0;
-  function pC(v) { return v >= 50 ? th.green : v >= 33 ? th.yellow : th.red; }
+  function pC(v, att) { return att === 0 ? th.text3 : v >= 50 ? th.green : v >= 33 ? th.yellow : th.red; }
   const cards = [
-    {label: t('report.shot_fg'),  made: fgm,    att: fga,    pct: fgpct,  col: th.accent},
-    {label: t('report.shot_fg2'), made: T.fg2m, att: T.fg2a, pct: fg2pct, col: th.accent},
-    {label: t('report.shot_fg3'), made: T.fg3m, att: T.fg3a, pct: fg3pct, col: th.accent},
-    {label: t('report.shot_ft'),  made: T.ftm,  att: T.fta,  pct: ftpct,  col: th.accent},
+    {label: t('report.shot_fg'),  made: fgm,    att: fga,    pct: fgpct,  col: pC(fgpct, fga)},
+    {label: t('report.shot_fg2'), made: T.fg2m, att: T.fg2a, pct: fg2pct, col: pC(fg2pct, T.fg2a)},
+    {label: t('report.shot_fg3'), made: T.fg3m, att: T.fg3a, pct: fg3pct, col: pC(fg3pct, T.fg3a)},
+    {label: t('report.shot_ft'),  made: T.ftm,  att: T.fta,  pct: ftpct,  col: pC(ftpct, T.fta)},
   ];
   const grid = mode === 'inapp'
     ? 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 16px 16px'
@@ -1698,7 +1701,7 @@ function renderShotSummaryHTML(rows, mode) {
     ${cards.map(c => `<div ${cardStyle}>
       <div style="font-size:11px;color:${th.text3};text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">${c.label}</div>
       <div style="font-size:26px;font-weight:900;color:${c.col};line-height:1">${c.made}/${c.att}</div>
-      <div style="font-size:20px;font-weight:700;color:${pC(c.pct)};margin-top:4px">${c.pct}%</div>
+      <div style="font-size:20px;font-weight:700;color:${pC(c.pct, c.att)};margin-top:4px">${c.pct}%</div>
     </div>`).join('')}
   </div>`;
 }
@@ -2997,7 +3000,7 @@ ${renderSubstitutionsHTML(m, 'export')}
 
 
 
-<div style="margin-top:24px;font-size:10px;color:#333;text-align:center">Generato da BsketBubble</div>
+<div style="margin-top:24px;font-size:10px;color:#333;text-align:center">Generato da BasketBubble</div>
 
 <!-- Player panel -->
 <div id="pp" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;background:#0a0a0f;overflow-y:auto;-webkit-overflow-scrolling:touch">
@@ -3033,7 +3036,7 @@ function showPlayer(pid) {
   const foul=p.foul||0;
   const min=p.min||0;
 
-  function pC(v){return v>=50?'#2ecc71':v>=33?'#f0c030':'#e74c3c';}
+  function pC(v, att) { return att === 0 ? '#555566' : v >= 50 ? '#2ecc71' : v >= 33 ? '#f0c030' : '#e74c3c'; }
 
   // Raccogli i periodi disponibili dai tiri
   const periodKeys=[..._matchStats.periods||[]];
@@ -3165,14 +3168,14 @@ function showPlayer(pid) {
     +'<div style="font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+t('player.shots_label')+'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.2pt_label')+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+fg2m+'/'+fg2a+'</div>'
-    +'<div style="font-size:14px;font-weight:700;color:'+pC(fg2p)+'">'+fg2p+'%</div></div>'
+    +'<div style="font-size:22px;font-weight:900;color:'+pC(fg2p,fg2a)+';line-height:1">'+fg2m+'/'+fg2a+'</div>'
+    +'<div style="font-size:14px;font-weight:700;color:'+pC(fg2p,fg2a)+'">'+fg2p+'%</div></div>'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.3pt_label')+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+fg3m+'/'+fg3a+'</div>'
-    +'<div style="font-size:14px;font-weight:700;color:'+pC(fg3p)+'">'+fg3p+'%</div></div>'
+    +'<div style="font-size:22px;font-weight:900;color:'+pC(fg3p,fg3a)+';line-height:1">'+fg3m+'/'+fg3a+'</div>'
+    +'<div style="font-size:14px;font-weight:700;color:'+pC(fg3p,fg3a)+'">'+fg3p+'%</div></div>'
     +'<div><div style="font-size:9px;color:#888;text-transform:uppercase;margin-bottom:4px">'+t('player.ft_label')+'</div>'
-    +'<div style="font-size:22px;font-weight:900;color:#f5a623;line-height:1">'+ftm+'/'+fta+'</div>'
-    +'<div style="font-size:14px;font-weight:700;color:'+pC(ftp)+'">'+ftp+'%</div></div>'
+    +'<div style="font-size:22px;font-weight:900;color:'+pC(ftp,fta)+';line-height:1">'+ftm+'/'+fta+'</div>'
+    +'<div style="font-size:14px;font-weight:700;color:'+pC(ftp,fta)+'">'+ftp+'%</div></div>'
     +'</div></div>'
 
     // ── VAL / +/- ──
@@ -4759,24 +4762,24 @@ function openPlayerModal(matchId, playerId) {
       </div>
     </div>
 
-    <!-- Shooting breakdown -->
+ <!-- Shooting breakdown -->
     <div style="margin:0 16px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px">
       <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">${t('player.shots_label')}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.2pt_label')}</div>
-          <div style="font-family:var(--font-display);font-size:22px;color:var(--blue)">${all.fg2m}/${all.fg2a}</div>
-          <div style="font-size:14px;font-weight:700;color:${fg2pct>=50?'var(--green)':fg2pct>=33?'var(--yellow)':'var(--red)'}">${fg2pct}%</div>
+            <div style="font-family:var(--font-display);font-size:22px;color:${all.fg2a===0?'var(--text3)':fg2pct>=50?'var(--green)':fg2pct>=33?'var(--yellow)':'var(--red)'}">${all.fg2m}/${all.fg2a}</div>
+            <div style="font-size:14px;font-weight:700;color:${all.fg2a===0?'var(--text3)':fg2pct>=50?'var(--green)':fg2pct>=33?'var(--yellow)':'var(--red)'}">${fg2pct}%</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.3pt_label')}</div>
-          <div style="font-family:var(--font-display);font-size:22px;color:#e8390e">${all.fg3m}/${all.fg3a}</div>
-          <div style="font-size:14px;font-weight:700;color:${fg3pct>=50?'var(--green)':fg3pct>=33?'var(--yellow)':'var(--red)'}">${fg3pct}%</div>
+            <div style="font-family:var(--font-display);font-size:22px;color:${all.fg3a===0?'var(--text3)':fg3pct>=50?'var(--green)':fg3pct>=33?'var(--yellow)':'var(--red)'}">${all.fg3m}/${all.fg3a}</div>
+            <div style="font-size:14px;font-weight:700;color:${all.fg3a===0?'var(--text3)':fg3pct>=50?'var(--green)':fg3pct>=33?'var(--yellow)':'var(--red)'}">${fg3pct}%</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${t('player.ft_label')}</div>
-          <div style="font-family:var(--font-display);font-size:22px;color:var(--accent)">${all.ftm}/${all.fta}</div>
-          <div style="font-size:14px;font-weight:700;color:${ftpct>=50?'var(--green)':ftpct>=33?'var(--yellow)':'var(--red)'}">${ftpct}%</div>
+            <div style="font-family:var(--font-display);font-size:22px;color:${all.fta===0?'var(--text3)':ftpct>=50?'var(--green)':ftpct>=33?'var(--yellow)':'var(--red)'}">${all.ftm}/${all.fta}</div>
+            <div style="font-size:14px;font-weight:700;color:${all.fta===0?'var(--text3)':ftpct>=50?'var(--green)':ftpct>=33?'var(--yellow)':'var(--red)'}">${ftpct}%</div>
         </div>
       </div>
     </div>
@@ -5402,6 +5405,28 @@ save = async function save() {
 // Rinnovo token preventivo ogni 50 minuti (token dura 60 min)
 setInterval(() => { if (driveEnabled && settings.driveFeatureEnabled) { driveToken = null; driveSync(); } }, 50 * 60 * 1000);
 
+
+
+// ── AdMob - Advertising ────────────────────────────────────────────────────────
+async function initAds() {
+  try {
+    await AdMob.initialize({ initializeForTesting: true });
+    await AdMob.showBanner({
+      adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
+      adSize: BannerAdSize.BANNER,
+      position: BannerAdPosition.BOTTOM_CENTER,
+      margin: 0,
+    });
+    AdMob.addListener('bannerAdSizeChanged', (info) => {
+      const nav = document.querySelector('nav');
+      if (nav) nav.style.marginBottom = info.height + 'px';
+    });
+  } catch(e) {
+    console.warn('AdMob non disponibile:', e);
+  }
+}
+
+
 // ═══ INIT ASINCRONO ═══
 // Tutta l'inizializzazione è async perché SecureStorage usa Web Crypto API (Promise-based).
 async function initApp() {
@@ -5444,6 +5469,9 @@ async function initApp() {
     }, 500);
     setTimeout(() => clearInterval(wait), 10000);
   }
+
+    // ── Inizializza AdMob ─────────────────────────────────────────
+    await initAds();
 
   // ── MIGRAZIONE DATI: ripara partite create con il bug parseInt(UUID)||0 ──
   state.matches.forEach(m => {
