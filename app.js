@@ -5409,14 +5409,35 @@ setInterval(() => { if (driveEnabled && settings.driveFeatureEnabled) { driveTok
 
 // ── AdMob - Advertising ────────────────────────────────────────────────────────
 async function initAds() {
+
+    // ── DEBUG OVERLAY (rimuovi prima del publish) ──
+  const dbg = document.createElement('div');
+  dbg.style = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,.85);color:#0f0;font-size:11px;padding:8px;font-family:monospace;max-height:40vh;overflow-y:auto';
+  document.body.appendChild(dbg);
+  const log = (msg) => { dbg.innerHTML += msg + '<br>'; };
+
+  log('isCapacitor: ' + isCapacitor);
+  log('AdMob: ' + (typeof AdMob));
+
+
   try {
+    log('initialize...');
+
     await AdMob.initialize({ initializeForTesting: true });
+
+    log('initialize OK');
+
+    log('showBanner...');
+
     await AdMob.showBanner({
       adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
       adSize: BannerAdSize.BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
     });
+
+    log('showBanner OK');
+
     // Fallback padding fisso in attesa del listener
     const nav = document.querySelector('nav');
     if (nav) nav.style.marginBottom = '60px';
@@ -5426,6 +5447,7 @@ async function initAds() {
       if (nav) nav.style.marginBottom = info.height + 'px';
     });
   } catch(e) {
+    log('ERRORE: ' + e.message);
     console.warn('AdMob non disponibile:', e);
   }
 }
