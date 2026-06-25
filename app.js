@@ -1,6 +1,6 @@
 // ── AdMob plugin (Capacitor) ─────────────────────────────────────
 const isCapacitor = window.Capacitor?.isNativePlatform?.() === true;// permette getione web senza crash. 
-const { AdMob, BannerAdSize, BannerAdPosition } = isCapacitor ? window.Capacitor.Plugins : {};
+const { AdMob } = isCapacitor ? window.Capacitor.Plugins : {};
 
 // Enum manuali — gli enum TypeScript non esistono a runtime in vanilla JS
 const BannerAdSize = {
