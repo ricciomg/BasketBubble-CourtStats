@@ -5471,7 +5471,7 @@ async function initApp() {
   }
 
     // ── Inizializza AdMob ─────────────────────────────────────────
-    //  await initAds();
+    await initAds();
 
   // ── MIGRAZIONE DATI: ripara partite create con il bug parseInt(UUID)||0 ──
   state.matches.forEach(m => {
