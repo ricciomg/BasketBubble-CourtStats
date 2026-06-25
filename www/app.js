@@ -2,6 +2,17 @@
 const isCapacitor = window.Capacitor?.isNativePlatform?.() === true;// permette getione web senza crash. 
 const { AdMob, BannerAdSize, BannerAdPosition } = isCapacitor ? window.Capacitor.Plugins : {};
 
+// Enum manuali — gli enum TypeScript non esistono a runtime in vanilla JS
+const BannerAdSize = {
+  BANNER: 'BANNER',
+  LARGE_BANNER: 'LARGE_BANNER',
+  ADAPTIVE_BANNER: 'ADAPTIVE_BANNER',
+};
+const BannerAdPosition = {
+  TOP_CENTER: 'TOP_CENTER',
+  BOTTOM_CENTER: 'BOTTOM_CENTER',
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // EVENT DELEGATION — sostituisce tutti gli onclick/onchange/oninput
 // inline per conformità CSP senza 'unsafe-inline'.Service Migration | Migration Tool reporting requirements
