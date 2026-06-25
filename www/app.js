@@ -5427,6 +5427,12 @@ async function initAds() {
 
     log('initialize OK');
 
+    log('importa gli enum esplicitamente...');
+    // Corretto — importa gli enum esplicitamen
+    
+    import { AdMob, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
+
+
     log('showBanner...');
 
     await AdMob.showBanner({
