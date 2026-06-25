@@ -5417,6 +5417,10 @@ async function initAds() {
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
     });
+    // Fallback padding fisso in attesa del listener
+    const nav = document.querySelector('nav');
+    if (nav) nav.style.marginBottom = '60px';
+    // Padding preciso quando AdMob comunica la dimensione reale
     AdMob.addListener('bannerAdSizeChanged', (info) => {
       const nav = document.querySelector('nav');
       if (nav) nav.style.marginBottom = info.height + 'px';
