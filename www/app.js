@@ -5427,20 +5427,20 @@ async function initAds() {
   document.body.appendChild(dbg);
   const log = (msg) => { dbg.innerHTML += msg + '<br>'; };
 
-  log('isCapacitor: ' + isCapacitor);
-  log('AdMob: ' + (typeof AdMob));
+  //RIMUOVERE log('isCapacitor: ' + isCapacitor);
+  //RIMUOVERE log('AdMob: ' + (typeof AdMob));
 
 
   try {
-    log('initialize...');
+    //RIMUOVERE log('initialize...');
 
     await AdMob.initialize({ initializeForTesting: true });
 
-    log('initialize OK');
+    //RIMUOVERE log('initialize OK');
 
-    log('importa gli enum esplicitamente...');
+    //RIMUOVERE log('importa gli enum esplicitamente...');
 
-    log('showBanner...');
+    //RIMUOVERE log('showBanner...');
 
     await AdMob.showBanner({
       adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
@@ -5449,21 +5449,31 @@ async function initAds() {
       margin: 0,
     });
 
-    log('showBanner OK');
+    //RIMUOVERE log('showBanner OK');
 
-    // Fallback padding fisso in attesa del listener
+    function applyBannerOffset(height) {
     const nav = document.querySelector('nav');
-    //RIMUOVERE if (nav) nav.style.marginBottom = '60px';
-    if (nav) nav.style.bottom = '60px'; // sposta nav sopra il banner 
-
-    // Padding preciso quando AdMob comunica la dimensione reale
-    AdMob.addListener('bannerAdSizeChanged', (info) => {
-      const nav = document.querySelector('nav');
-    //RIMUOVERE   if (nav) nav.style.marginBottom = info.height + 'px';
-      if (nav) nav.style.bottom = info.height + 'px';
-    // Aggiusta anche il padding del body per il contenuto scrollabile
-    document.body.style.paddingBottom = (info.height + 60) + 'px';
+    if (nav) {
+      nav.style.bottom = height + 'px';
+      nav.style.transition = 'bottom 0.2s';
+    }
+    // Aggiunge spazio in fondo alle pagine per non nascondere contenuto
+    document.querySelectorAll('.page').forEach(p => {
+      p.style.paddingBottom = (80 + height) + 'px';
     });
+    // Aggiusta anche il toast
+    const toast = document.getElementById('toast');
+    if (toast) toast.style.bottom = (100 + height) + 'px';
+  }
+
+    // Fallback immediato con stima
+    applyBannerOffset(50);
+
+    // Valore preciso quando AdMob lo comunica
+  AdMob.addListener('bannerAdSizeChanged', (info) => {
+    log('bannerHeight: ' + info.height);
+    applyBannerOffset(info.height);
+  });
   } catch(e) {
     log('ERRORE: ' + e.message);
     console.warn('AdMob non disponibile:', e);
