@@ -5453,11 +5453,16 @@ async function initAds() {
 
     // Fallback padding fisso in attesa del listener
     const nav = document.querySelector('nav');
-    if (nav) nav.style.marginBottom = '60px';
+    //RIMUOVERE if (nav) nav.style.marginBottom = '60px';
+    if (nav) nav.style.bottom = '60px'; // sposta nav sopra il banner 
+
     // Padding preciso quando AdMob comunica la dimensione reale
     AdMob.addListener('bannerAdSizeChanged', (info) => {
       const nav = document.querySelector('nav');
-      if (nav) nav.style.marginBottom = info.height + 'px';
+    //RIMUOVERE   if (nav) nav.style.marginBottom = info.height + 'px';
+      if (nav) nav.style.bottom = info.height + 'px';
+    // Aggiusta anche il padding del body per il contenuto scrollabile
+    document.body.style.paddingBottom = (info.height + 60) + 'px';
     });
   } catch(e) {
     log('ERRORE: ' + e.message);
