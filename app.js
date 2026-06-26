@@ -5454,11 +5454,26 @@ async function initAds() {
     function applyBannerOffset(height) {
     const nav = document.querySelector('nav');
     if (nav) {
+
+    //BLOCCO DI LOGGING
+      const rect = nav.getBoundingClientRect();
+    log('nav PRIMA - top:' + rect.top + ' bottom:' + rect.bottom + ' height:' + rect.height);
+    log('nav PRIMA - style.bottom:' + nav.style.bottom);
+    log('window.innerHeight: ' + window.innerHeight);
+      
       nav.style.setProperty('bottom', height + 'px', 'important');
       nav.style.transition = 'bottom 0.2s';
       // Rimuovi il safe-area per evitare doppio offset
       nav.style.padding = '8px 0';
-    }
+
+    // Aspetta che il browser applichi lo stile
+    setTimeout(() => {
+      const rect2 = nav.getBoundingClientRect();
+      log('nav DOPO - top:' + rect2.top + ' bottom:' + rect2.bottom);
+      log('nav DOPO - style.bottom:' + nav.style.bottom);
+      log('nav computed bottom: ' + getComputedStyle(nav).bottom);
+    }, 300);
+  }
     // Aggiunge spazio in fondo alle pagine per non nascondere contenuto
       document.querySelectorAll('.page').forEach(p => {
         p.style.paddingBottom = (80 + height) + 'px';
