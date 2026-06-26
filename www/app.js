@@ -5449,25 +5449,32 @@ async function initAds() {
       margin: 0,
     });
 
-    //RIMUOVERE log('showBanner OK');
+    log('showBanner OK');
 
     function applyBannerOffset(height) {
     const nav = document.querySelector('nav');
     if (nav) {
-      nav.style.bottom = height + 'px';
+      nav.style.setProperty('bottom', height + 'px', 'important');
       nav.style.transition = 'bottom 0.2s';
+      // Rimuovi il safe-area per evitare doppio offset
+      nav.style.padding = '8px 0';
     }
     // Aggiunge spazio in fondo alle pagine per non nascondere contenuto
-    document.querySelectorAll('.page').forEach(p => {
-      p.style.paddingBottom = (80 + height) + 'px';
+      document.querySelectorAll('.page').forEach(p => {
+        p.style.paddingBottom = (80 + height) + 'px';
     });
     // Aggiusta anche il toast
     const toast = document.getElementById('toast');
     if (toast) toast.style.bottom = (100 + height) + 'px';
+
+    log('nav.bottom: ' + (nav ? nav.style.bottom : 'non trovata'))
   }
 
     // Fallback immediato con stima
-    applyBannerOffset(50);
+    //applyBannerOffset(50);
+
+    // Fallback con ritardo per sicurezza
+    setTimeout(() => applyBannerOffset(50), 500);
 
     // Valore preciso quando AdMob lo comunica
   AdMob.addListener('bannerAdSizeChanged', (info) => {
