@@ -5452,7 +5452,10 @@ async function initAds() {
     log('showBanner OK');
 
     function applyBannerOffset(height) {
-  const nav = document.querySelector('nav');
+
+    const systemNavBar = screen.height - window.innerHeight; // 94px sul tuo device
+    const totalOffset = height + systemNavBar;  // 50 + 94 = 144
+    const nav = document.querySelector('nav');
   
   if (nav) {
     nav.style.setProperty('bottom', height + 'px', 'important');
