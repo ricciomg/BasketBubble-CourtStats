@@ -13,6 +13,14 @@ const BannerAdPosition = {
   BOTTOM_CENTER: 'BOTTOM_CENTER',
 };
 
+const BannerAdPluginEvents = {
+  Loaded: 'bannerAdLoaded',
+  FailedToLoad: 'bannerAdFailedToLoad',
+  Opened: 'bannerAdOpened',
+  Closed: 'bannerAdClosed',
+  AdImpression: 'bannerAdImpression',
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // EVENT DELEGATION — sostituisce tutti gli onclick/onchange/oninput
 // inline per conformità CSP senza 'unsafe-inline'.Service Migration | Migration Tool reporting requirements
@@ -5483,8 +5491,8 @@ async function initAds() {
     // Fallback immediato con stima
     //applyBannerOffset(50);
 
-    // Fallback con ritardo per sicurezza
-    //setTimeout(() => applyBannerOffset(50), 500);
+    // fallback nel caso l'evento non scatti
+    setTimeout(() => applyBannerOffset(50), 1000);
 
     // Valore preciso quando AdMob lo comunica
   AdMob.addListener(BannerAdPluginEvents.Loaded, (info) => {
