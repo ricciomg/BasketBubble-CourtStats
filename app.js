@@ -5452,30 +5452,28 @@ async function initAds() {
     log('showBanner OK');
 
     function applyBannerOffset(height) {
-    
-      const MARGIN = 50; // deve corrispondere al margin nel showBanner (vedi await AdMob.showBanner sopra)
-      const totalOffset = height + MARGIN;
-
-    const nav = document.querySelector('nav');
-    
-    if (nav) {
-
-      nav.style.setProperty('bottom', height + 'px', 'important');
-
-      nav.style.transition = 'bottom 0.2s';
-      // Rimuovi il safe-area per evitare doppio offset
-      nav.style.padding = '8px 0';
+  const nav = document.querySelector('nav');
+  
+  if (nav) {
+    nav.style.setProperty('bottom', height + 'px', 'important');
+    nav.style.transition = 'bottom 0.2s';
+    nav.style.padding = '8px 0';
   }
-    // Aggiunge spazio in fondo alle pagine per non nascondere contenuto
-      document.querySelectorAll('.page').forEach(p => {
-        p.style.paddingBottom = (80 + totalOffset) + 'px';
-    });
-    // Aggiusta anche il toast
-    const toast = document.getElementById('toast');
-    if (toast) toast.style.bottom = (100 + height) + 'px';
 
-    log('nav.bottom: ' + (nav ? nav.style.bottom : 'non trovata'))
-  }
+  document.querySelectorAll('.page').forEach(p => {
+    p.style.paddingBottom = (80 + height) + 'px';
+  });
+
+  const toast = document.getElementById('toast');
+  if (toast) toast.style.bottom = (100 + height) + 'px';
+
+  // Log diagnostici
+  log('visualViewport.height: ' + (window.visualViewport ? window.visualViewport.height : 'N/A'));
+  log('screen.height: ' + screen.height);
+  log('window.innerHeight: ' + window.innerHeight);
+  log('differenza screen-inner: ' + (screen.height - window.innerHeight));
+  log('nav.bottom impostato: ' + height + 'px');
+}
 
     // Fallback immediato con stima
     //applyBannerOffset(50);
