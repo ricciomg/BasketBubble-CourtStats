@@ -5446,48 +5446,50 @@ async function initAds() {
       adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
       adSize: BannerAdSize.BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
-       margin: 50,  // ← spinge il banner verso l'alto di 50px fisici
+      margin: 0,  // ← togli il margin fisso, lo gestiamo noi via CSS
     });
 
     log('showBanner OK');
 
-    function applyBannerOffset(height) {
-
-    const systemNavBar = screen.height - window.innerHeight; // 94px sul tuo device
-    const totalOffset = height + systemNavBar;  // 50 + 94 = 144
-    const nav = document.querySelector('nav');
+    function applyBannerOffset(bannerHeight) {
+  // visualViewport.height esclude tastiera e nav bar di sistema
+  // window.innerHeight le include → la differenza è la nav bar
+  const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const systemNavHeight = window.innerHeight - vvHeight;  // nav bar di sistema (es. 44px)
   
+  // Il banner è posizionato da AdMob sopra la nav bar di sistema.
+  // Noi dobbiamo alzare la nostra nav app della sola altezza del banner.
+  const navOffset = bannerHeight + 8;  // 50px — la nav bar di sistema non tocca il nostro layout
+  const contentOffset = bannerHeight + 8;
+
+  const nav = document.querySelector('nav');
   if (nav) {
-    nav.style.setProperty('bottom', height + 'px', 'important');
+    nav.style.setProperty('bottom', navOffset + 'px', 'important');
     nav.style.transition = 'bottom 0.2s';
-    nav.style.padding = '8px 0';
   }
 
   document.querySelectorAll('.page').forEach(p => {
-    p.style.paddingBottom = (80 + height) + 'px';
+    p.style.paddingBottom = (80 + contentOffset) + 'px';
   });
 
   const toast = document.getElementById('toast');
-  if (toast) toast.style.bottom = (100 + height) + 'px';
+  if (toast) toast.style.bottom = (100 + contentOffset) + 'px';
 
-  // Log diagnostici
-  log('visualViewport.height: ' + (window.visualViewport ? window.visualViewport.height : 'N/A'));
-  log('screen.height: ' + screen.height);
-  log('window.innerHeight: ' + window.innerHeight);
-  log('differenza screen-inner: ' + (screen.height - window.innerHeight));
-  log('nav.bottom impostato: ' + height + 'px');
+  log('bannerHeight: ' + bannerHeight);
+  log('systemNavHeight (vv): ' + systemNavHeight);
+  log('navOffset applicato: ' + navOffset + 'px');
 }
 
     // Fallback immediato con stima
     //applyBannerOffset(50);
 
     // Fallback con ritardo per sicurezza
-    setTimeout(() => applyBannerOffset(50), 500);
+    //setTimeout(() => applyBannerOffset(50), 500);
 
     // Valore preciso quando AdMob lo comunica
-  AdMob.addListener('bannerAdSizeChanged', (info) => {
-    log('bannerHeight: ' + info.height);
-    applyBannerOffset(info.height);
+  AdMob.addListener(BannerAdPluginEvents.Loaded, (info) => {
+  const h = info.bannerHeight ?? 50;
+  applyBannerOffset(h);
   });
   } catch(e) {
     log('ERRORE: ' + e.message);
