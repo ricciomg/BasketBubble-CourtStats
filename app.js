@@ -5463,12 +5463,17 @@ async function initAds() {
   // visualViewport.height esclude tastiera e nav bar di sistema
   // window.innerHeight le include → la differenza è la nav bar
   const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  const systemNavHeight = window.innerHeight - vvHeight;  // nav bar di sistema (es. 44px)
+  // Nav bar di sistema = differenza tra innerHeight e visualViewport
+  // Ma usiamo screen.height - window.innerHeight come fallback più affidabile
+  const systemNavHeight = Math.max(
+    window.innerHeight - vvHeight,
+    screen.height - window.innerHeight  // ~94px sul tuo device
+  );
   
-  // Il banner è posizionato da AdMob sopra la nav bar di sistema.
-  // Noi dobbiamo alzare la nostra nav app della sola altezza del banner.
-  const navOffset = bannerHeight + 8;  // 50px — la nav bar di sistema non tocca il nostro layout
-  const contentOffset = bannerHeight + 8;
+  // La nav app deve salire di: banner + nav sistema + margine
+  const navOffset = bannerHeight + systemNavHeight + 8;
+  const contentOffset = bannerHeight + systemNavHeight + 8;
+
 
   const nav = document.querySelector('nav');
   if (nav) {
