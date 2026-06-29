@@ -5459,31 +5459,38 @@ async function initAds() {
 
     log('showBanner OK');
 
-   function applyBannerOffset(bannerHeight) {
-  const systemNavHeight = screen.height - window.innerHeight; // ~94px sul tuo device
+    function applyBannerOffset(bannerHeight) {
+  // visualViewport.height esclude tastiera e nav bar di sistema
+  // window.innerHeight le include → la differenza è la nav bar
+  const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  // Nav bar di sistema = differenza tra innerHeight e visualViewport
+  // Ma usiamo screen.height - window.innerHeight come fallback più affidabile
+  const systemNavHeight = Math.max(
+    window.innerHeight - vvHeight,
+    screen.height - window.innerHeight  // ~94px sul tuo device
+  );
+  
+  // La nav app deve salire di: banner + nav sistema + margine
+  const navOffset = bannerHeight + systemNavHeight + 8;
+  const contentOffset = bannerHeight + systemNavHeight + 8;
 
-  // Nav app: sale di quanto basta per stare sopra la nav bar di sistema
-  const navBottom = systemNavHeight;
-
-  // Padding contenuto: nav bar sistema + nav app stimata (~70px) + banner
-  const contentOffset = systemNavHeight + 70 + bannerHeight;
 
   const nav = document.querySelector('nav');
   if (nav) {
-    nav.style.setProperty('bottom', navBottom + 'px', 'important');
+    nav.style.setProperty('bottom', navOffset + 'px', 'important');
     nav.style.transition = 'bottom 0.2s';
   }
 
   document.querySelectorAll('.page').forEach(p => {
-    p.style.paddingBottom = contentOffset + 'px';
+    p.style.paddingBottom = (80 + contentOffset) + 'px';
   });
 
   const toast = document.getElementById('toast');
-  if (toast) toast.style.bottom = (contentOffset + 16) + 'px';
+  if (toast) toast.style.bottom = (100 + contentOffset) + 'px';
 
-  log('systemNavHeight: ' + systemNavHeight);
-  log('navBottom: ' + navBottom + 'px');
-  log('contentOffset: ' + contentOffset + 'px');
+  log('bannerHeight: ' + bannerHeight);
+  log('systemNavHeight (vv): ' + systemNavHeight);
+  log('navOffset applicato: ' + navOffset + 'px');
 }
 
     // Fallback immediato con stima
