@@ -5465,7 +5465,8 @@ async function initAds() {
   const nav = document.querySelector('nav');
   if (nav) {
     nav.style.setProperty('bottom', '0px', 'important');
-    nav.style.setProperty('padding-bottom', '8px', 'important'); // ← override del safe-area-inset
+    nav.style.setProperty('padding-bottom', '4px', 'important'); // ← override del safe-area-inset
+    nav.style.setProperty('padding-top', '4px', 'important');    // nuovo, se vuoi comprimere anche sopra
     nav.style.transition = 'bottom 0.2s';
   }
 
