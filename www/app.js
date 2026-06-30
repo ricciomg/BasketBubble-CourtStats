@@ -486,13 +486,29 @@ function showPage(id, el) {
   if(id==='settings') renderSettings();
 }
 function gotoPage(id) { showPage(id, document.querySelectorAll('.nav-item')[{roster:0,matches:1,live:2,report:3,settings:4}[id]]); }
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); 
+  
+  //BLOCCO PER NASCONDERE BANNER QUANDO SI APRE MODALE
+  if (isCapacitor && AdMob) {
+    AdMob.hideBanner().catch(() => {});
+  }
+}
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   // If closing opp roster while in setup state, refresh the setup preview
   if (id === 'modal-opp-roster' && liveMatch !== null) {
     const m = state.matches[liveMatch];
     if (m && m.status === 'setup') renderLiveSetup();
+  }
+
+  //BLOCCO PER FAR RIAPPARIRE BANNER QUANDO SI CHIUDE MODALE
+   if (isCapacitor && AdMob) {
+    AdMob.showBanner({
+      adId: 'ca-app-pub-3940256099942544/6300978111',
+      adSize: BannerAdSize.BANNER,
+      position: BannerAdPosition.BOTTOM_CENTER,
+      margin: 0,
+    }).catch(() => {});
   }
 }
 function toast(msg,dur=2000) {
