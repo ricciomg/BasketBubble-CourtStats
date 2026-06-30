@@ -509,8 +509,10 @@ function closeModal(id) {
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
     }).then(() => {
+      log('Banner ri-mostrato OK');
       console.log('Banner ri-mostrato OK');
     }).catch((e) => {
+      log('Errore showBanner in closeModal:' + e);
       console.error('Errore showBanner in closeModal:', e);
     });
   }
