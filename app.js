@@ -502,15 +502,20 @@ function closeModal(id) {
   }
 
   //BLOCCO PER FAR RIAPPARIRE BANNER QUANDO SI CHIUDE MODALE
-   if (isCapacitor && AdMob) {
+  if (isCapacitor && AdMob) {
     AdMob.showBanner({
       adId: 'ca-app-pub-3940256099942544/6300978111',
       adSize: BannerAdSize.BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
-    }).catch(() => {});
+    }).then(() => {
+      console.log('Banner ri-mostrato OK');
+    }).catch((e) => {
+      console.error('Errore showBanner in closeModal:', e);
+    });
   }
 }
+
 function toast(msg,dur=2000) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
