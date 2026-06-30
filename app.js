@@ -5465,8 +5465,7 @@ async function initAds() {
   const nav = document.querySelector('nav');
   if (nav) {
     nav.style.setProperty('bottom', '0px', 'important');
-    nav.style.setProperty('padding-bottom', '4px', 'important'); // ← override del safe-area-inset
-    nav.style.setProperty('padding-top', '4px', 'important');    // nuovo, se vuoi comprimere anche sopra
+    nav.style.setProperty('padding-bottom', '4px', 'important');
     nav.style.transition = 'bottom 0.2s';
   }
 
@@ -5478,8 +5477,22 @@ async function initAds() {
   const toast = document.getElementById('toast');
   if (toast) toast.style.bottom = (contentOffset + 16) + 'px';
 
-  log('nav padding-bottom forzato a 8px');
-  log('contentOffset: ' + contentOffset + 'px');
+  // ── LOG DIAGNOSTICI VERI (leggono il valore reale, non testo fisso) ──
+  if (nav) {
+    const computed = getComputedStyle(nav);
+    log('nav.offsetHeight: ' + nav.offsetHeight + 'px');
+    log('nav padding-bottom (computed): ' + computed.paddingBottom);
+    log('nav padding-top (computed): ' + computed.paddingTop);
+    const item = nav.querySelector('.nav-item');
+    if (item) {
+      log('nav-item.offsetHeight: ' + item.offsetHeight + 'px');
+      log('nav-item padding (computed): ' + getComputedStyle(item).padding);
+    }
+    const svg = nav.querySelector('.nav-item svg');
+    if (svg) {
+      log('svg width/height (computed): ' + getComputedStyle(svg).width + ' / ' + getComputedStyle(svg).height);
+    }
+  }
 }
 
     // Fallback immediato con stima
