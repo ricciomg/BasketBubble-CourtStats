@@ -5460,20 +5460,16 @@ async function initAds() {
     log('showBanner OK');
 
    function applyBannerOffset(bannerHeight) {
-  const systemNavHeight = screen.height - window.innerHeight; // ~94px sul tuo device
-
-  // Nav app: sale di quanto basta per stare sopra la nav bar di sistema
-  const navBottom = systemNavHeight;
-
-  // Padding contenuto: nav bar sistema + nav app stimata (~70px) + banner
-  const contentOffset = systemNavHeight + 70 + bannerHeight;
+  const systemNavHeight = screen.height - window.innerHeight;
 
   const nav = document.querySelector('nav');
   if (nav) {
-    nav.style.setProperty('bottom', navBottom + 'px', 'important');
+    nav.style.setProperty('bottom', '0px', 'important');
+    nav.style.setProperty('padding-bottom', '8px', 'important'); // ← override del safe-area-inset
     nav.style.transition = 'bottom 0.2s';
   }
 
+  const contentOffset = systemNavHeight + 70 + bannerHeight;
   document.querySelectorAll('.page').forEach(p => {
     p.style.paddingBottom = contentOffset + 'px';
   });
@@ -5481,8 +5477,7 @@ async function initAds() {
   const toast = document.getElementById('toast');
   if (toast) toast.style.bottom = (contentOffset + 16) + 'px';
 
-  log('systemNavHeight: ' + systemNavHeight);
-  log('navBottom: ' + navBottom + 'px');
+  log('nav padding-bottom forzato a 8px');
   log('contentOffset: ' + contentOffset + 'px');
 }
 
