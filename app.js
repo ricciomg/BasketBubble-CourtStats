@@ -5456,15 +5456,8 @@ async function initAds() {
 
 
   try {
-    //RIMUOVERE log('initialize...');
 
     await AdMob.initialize({ initializeForTesting: true });
-
-    //RIMUOVERE log('initialize OK');
-
-    //RIMUOVERE log('importa gli enum esplicitamente...');
-
-    //RIMUOVERE log('showBanner...');
 
     await AdMob.showBanner({
       adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
@@ -5473,7 +5466,7 @@ async function initAds() {
       margin: 0,  // ← togli il margin fisso, lo gestiamo noi via CSS
     });
 
-    log('showBanner OK');
+    //log('showBanner OK');
 
    function applyBannerOffset(bannerHeight) {
   const systemNavHeight = screen.height - window.innerHeight;
@@ -5496,17 +5489,17 @@ async function initAds() {
   // ── LOG DIAGNOSTICI VERI (leggono il valore reale, non testo fisso) ──
   if (nav) {
     const computed = getComputedStyle(nav);
-    log('nav.offsetHeight: ' + nav.offsetHeight + 'px');
-    log('nav padding-bottom (computed): ' + computed.paddingBottom);
-    log('nav padding-top (computed): ' + computed.paddingTop);
+    //log('nav.offsetHeight: ' + nav.offsetHeight + 'px');
+    //log('nav padding-bottom (computed): ' + computed.paddingBottom);
+    //log('nav padding-top (computed): ' + computed.paddingTop);
     const item = nav.querySelector('.nav-item');
     if (item) {
-      log('nav-item.offsetHeight: ' + item.offsetHeight + 'px');
-      log('nav-item padding (computed): ' + getComputedStyle(item).padding);
+      //log('nav-item.offsetHeight: ' + item.offsetHeight + 'px');
+      //log('nav-item padding (computed): ' + getComputedStyle(item).padding);
     }
     const svg = nav.querySelector('.nav-item svg');
     if (svg) {
-      log('svg width/height (computed): ' + getComputedStyle(svg).width + ' / ' + getComputedStyle(svg).height);
+      //log('svg width/height (computed): ' + getComputedStyle(svg).width + ' / ' + getComputedStyle(svg).height);
     }
   }
 }
