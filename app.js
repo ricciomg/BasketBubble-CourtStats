@@ -21,6 +21,12 @@ const BannerAdPluginEvents = {
   AdImpression: 'bannerAdImpression',
 };
 
+//CONST PER REWARDED VIDEO IN FASE DI EXPORT
+const AdMobRewardType = {
+  Rewarded: 'onRewardedVideoAdRewarded',
+  FailedToLoad: 'onRewardedVideoAdFailedToLoad',
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // EVENT DELEGATION — sostituisce tutti gli onclick/onchange/oninput
 // inline per conformità CSP senza 'unsafe-inline'.Service Migration | Migration Tool reporting requirements
@@ -2231,6 +2237,10 @@ async function exportReport() {
   const id = document.getElementById('report-match-select').value;
   const m  = state.matches.find(x=>x.id===id);
   if(!m){ toast(t('report.select_match')); return; }
+
+  // Mostra rewarded adMob — se l'utente non guarda, non procede
+  const rewarded = await showRewardedAd();
+  if (!rewarded) { toast(t('report.ad_required')); return; }
 
   // Build standalone HTML report
   const {rows, pmMap: pmMapExp, periods, ptotals} = buildMatchData(m);
@@ -5542,6 +5552,27 @@ async function showQuarterTransitionAd() {
   }
 }
 
+// ── AdMob - Rewarded per export report ──────────────────────────────────────────────
+async function showRewardedAd() {
+  if (!isCapacitor || !AdMob) return true; // su web/desktop procedi sempre
+  try {
+    await AdMob.prepareRewardVideoAd({
+      adId: 'ca-app-pub-3940256099942544/5224354917', // test rewarded ID
+    });
+    return await new Promise((resolve) => {
+      AdMob.addListener(AdMobRewardType.Rewarded, () => {
+        resolve(true); // utente ha guadagnato la ricompensa
+      });
+      AdMob.addListener(AdMobRewardType.FailedToLoad, () => {
+        resolve(true); // se fallisce, procedi comunque
+      });
+      AdMob.showRewardVideoAd().catch(() => resolve(true));
+    });
+  } catch (e) {
+    console.warn('Rewarded ad non disponibile:', e);
+    return true; // se errore, procedi comunque
+  }
+}
 
 // ═══ INIT ASINCRONO ═══
 // Tutta l'inizializzazione è async perché SecureStorage usa Web Crypto API (Promise-based).

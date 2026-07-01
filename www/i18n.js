@@ -807,6 +807,9 @@ const STRINGS = {
    // OTTIMIZZAZIONE REPORT ESPORTATO
   'report.export_disabled':    { it: 'Export disabilitato nelle impostazioni', en: 'Export disabled in settings'       },
   'report.exported_ok':    { it: 'Report esportato ✓', en: 'Report exported ✓'       },
+
+   // in i18n.js
+   'report.ad_required': { it: 'Guarda il video per estrarre il report', en: 'Watch the video to export the report' }
 };
 
 // ═══ RUNTIME ══════════════════════════════════════════════════════
