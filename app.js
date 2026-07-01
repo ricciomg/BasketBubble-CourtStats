@@ -1,3 +1,9 @@
+// ── DEBUG OVERLAY (rimuovi prima del publish) - genera log ──
+const _dbg = document.createElement('div');
+_dbg.style = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,.85);color:#0f0;font-size:11px;padding:8px;font-family:monospace;max-height:40vh;overflow-y:auto;pointer-events:none';
+document.body.appendChild(_dbg);
+function dbgLog(msg) { _dbg.innerHTML += msg + '<br>'; }
+
 // ── AdMob plugin (Capacitor) ─────────────────────────────────────
 const isCapacitor = window.Capacitor?.isNativePlatform?.() === true;// permette getione web senza crash. 
 const { AdMob } = isCapacitor ? window.Capacitor.Plugins : {};
@@ -497,17 +503,26 @@ function showPage(id, el) {
   if(id==='settings') renderSettings();
 
 // Banner visibile solo nella pagina report
-  if (isCapacitor && AdMob && !adsRemoved) {
+if (isCapacitor && AdMob && !adsRemoved) {
     if (id === 'report') {
-      AdMob.hideBanner().catch(() => {}).finally(() => {
+      dbgLog('→ report: hideBanner...');
+      AdMob.hideBanner().catch((e) => {
+        dbgLog('hideBanner error: ' + e.message);
+      }).finally(() => {
+        dbgLog('→ showBanner...');
         AdMob.showBanner({
           adId: 'ca-app-pub-3940256099942544/6300978111',
           adSize: BannerAdSize.BANNER,
           position: BannerAdPosition.BOTTOM_CENTER,
           margin: 0,
-        }).catch(() => {});
+        }).then(() => {
+          dbgLog('showBanner OK');
+        }).catch((e) => {
+          dbgLog('showBanner ERRORE: ' + e.message);
+        });
       });
     } else {
+      dbgLog('→ pagina ' + id + ': hideBanner');
       AdMob.hideBanner().catch(() => {});
     }
   }
