@@ -5554,23 +5554,16 @@ async function showQuarterTransitionAd() {
 
 // ── AdMob - Rewarded per export report ──────────────────────────────────────────────
 async function showRewardedAd() {
-  if (!isCapacitor || !AdMob) return true; // su web/desktop procedi sempre
+  if (!isCapacitor || !AdMob) return true;
   try {
     await AdMob.prepareRewardVideoAd({
-      adId: 'ca-app-pub-3940256099942544/5224354917', // test rewarded ID
+      adId: 'ca-app-pub-3940256099942544/5224354917',
     });
-    return await new Promise((resolve) => {
-      AdMob.addListener(AdMobRewardType.Rewarded, () => {
-        resolve(true); // utente ha guadagnato la ricompensa
-      });
-      AdMob.addListener(AdMobRewardType.FailedToLoad, () => {
-        resolve(true); // se fallisce, procedi comunque
-      });
-      AdMob.showRewardVideoAd().catch(() => resolve(true));
-    });
+    await AdMob.showRewardVideoAd(); // ← await aspetta che l'utente chiuda il video
+    return true;
   } catch (e) {
     console.warn('Rewarded ad non disponibile:', e);
-    return true; // se errore, procedi comunque
+    return true; // procedi comunque se errore
   }
 }
 
