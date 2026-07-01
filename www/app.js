@@ -505,11 +505,10 @@ function showPage(id, el) {
 // Banner visibile solo nella pagina report
 if (isCapacitor && AdMob && !adsRemoved) {
     if (id === 'report') {
-      dbgLog('→ report: hideBanner...');
-      AdMob.hideBanner().catch((e) => {
-        dbgLog('hideBanner error: ' + e.message);
+      dbgLog('→ report: removeBanner poi showBanner...');
+      AdMob.removeBanner().catch((e) => {
+        dbgLog('removeBanner error (ignorato): ' + e.message);
       }).finally(() => {
-        dbgLog('→ showBanner...');
         AdMob.showBanner({
           adId: 'ca-app-pub-3940256099942544/6300978111',
           adSize: BannerAdSize.BANNER,
