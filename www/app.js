@@ -1464,6 +1464,7 @@ async function doContinue() {
     m.players.forEach(p=>{ m.stats[p.id][k]=es(); if(p.onCourt) { p.minStart=pStart(m); p.subRemainSec=null; } });
   }
   await save(); closeModal('modal-next-period'); toast(t('period.started',{p:periodLabel(m)}));
+  await showQuarterTransitionAd(); // ← interstitial alla transizione del quarto AdMob
   timerInit(m);
   renderLive();
 }
@@ -5525,6 +5526,19 @@ async function initAds() {
   } catch(e) {
     log('ERRORE: ' + e.message);
     console.warn('AdMob non disponibile:', e);
+  }
+}
+
+// ── AdMob - Interstitial a transizione quarto──────────────────────────────────────────────
+async function showQuarterTransitionAd() {
+  if (!isCapacitor || !AdMob) return;
+  try {
+    await AdMob.prepareInterstitial({
+      adId: 'ca-app-pub-3940256099942544/1033173712', // test interstitial ID
+    });
+    await AdMob.showInterstitial();
+  } catch (e) {
+    console.warn('Interstitial non disponibile:', e);
   }
 }
 
