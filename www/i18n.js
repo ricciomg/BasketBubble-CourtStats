@@ -808,8 +808,15 @@ const STRINGS = {
   'report.export_disabled':    { it: 'Export disabilitato nelle impostazioni', en: 'Export disabled in settings'       },
   'report.exported_ok':    { it: 'Report esportato ✓', en: 'Report exported ✓'       },
 
-   // in i18n.js
-   'report.ad_required': { it: 'Guarda il video per estrarre il report', en: 'Watch the video to export the report' }
+   // REWARDING VIDEO ESPORTATO
+   'report.ad_required': { it: 'Guarda il video per estrarre il report', en: 'Watch the video to export the report' },
+
+   // RIMUOVI PUBBLICITA' AdMob
+   'settings.removeAds.title': { it: '🚫 Rimuovi pubblicità', en: '🚫 Remove Ads' },
+   'settings.removeAds.desc':  { it: 'Acquista una volta per rimuovere tutti i banner e i video pubblicitari per un anno.', en: 'Buy once and remove all banners and video ads for 12 months.' },
+   'settings.removeAds.btn':   { it: 'Acquista — Rimuovi Ads', en: 'Purchase — Remove Ads' },
+
+   'settings.removeAds.soon': { it: 'Funzione in arrivo prossimamente!', en: 'Feature coming soon!' },
 };
 
 // ═══ RUNTIME ══════════════════════════════════════════════════════

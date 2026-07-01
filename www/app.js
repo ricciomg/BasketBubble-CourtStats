@@ -27,6 +27,10 @@ const AdMobRewardType = {
   FailedToLoad: 'onRewardedVideoAdFailedToLoad',
 };
 
+//GESTION RIMOZIONE PUBBLICITA' ADMOB PER ABBONAMENTO 
+let adsRemoved = false; // deve diventare true quando l'utente acquista
+
+
 // ═══════════════════════════════════════════════════════════════════
 // EVENT DELEGATION — sostituisce tutti gli onclick/onchange/oninput
 // inline per conformità CSP senza 'unsafe-inline'.Service Migration | Migration Tool reporting requirements
@@ -5462,6 +5466,9 @@ setInterval(() => { if (driveEnabled && settings.driveFeatureEnabled) { driveTok
 
 // ── AdMob - Advertising ────────────────────────────────────────────────────────
 async function initAds() {
+    
+  // RIMOZIONE ADVERTISING A PAGAMENTO
+    if (adsRemoved) return;
 
     // ── DEBUG OVERLAY (rimuovi prima del publish) ──
   const dbg = document.createElement('div');
@@ -5541,7 +5548,7 @@ async function initAds() {
 
 // ── AdMob - Interstitial a transizione quarto──────────────────────────────────────────────
 async function showQuarterTransitionAd() {
-  if (!isCapacitor || !AdMob) return;
+  if (!isCapacitor || !AdMob || adsRemoved) return;
   try {
     await AdMob.prepareInterstitial({
       adId: 'ca-app-pub-3940256099942544/1033173712', // test interstitial ID
@@ -5554,7 +5561,7 @@ async function showQuarterTransitionAd() {
 
 // ── AdMob - Rewarded per export report ──────────────────────────────────────────────
 async function showRewardedAd() {
-  if (!isCapacitor || !AdMob) return true;
+  if (!isCapacitor || !AdMob || adsRemoved) return true;
   try {
     await AdMob.prepareRewardVideoAd({
       adId: 'ca-app-pub-3940256099942544/5224354917',
@@ -5566,6 +5573,19 @@ async function showRewardedAd() {
     return true; // procedi comunque se errore
   }
 }
+
+// ── AdMob - ABBONAMENTO  RIMOZIONE PUBBLICITA' ──────────────────────────────────────────────
+async function purchaseRemoveAds() {
+  const btn = document.getElementById('remove-ads-btn');
+  const status = document.getElementById('remove-ads-status');
+  btn.disabled = true;
+  status.textContent = t('settings.removeAds.soon');
+  setTimeout(() => {
+    btn.disabled = false;
+    status.textContent = '';
+  }, 2000);
+}
+
 
 // ═══ INIT ASINCRONO ═══
 // Tutta l'inizializzazione è async perché SecureStorage usa Web Crypto API (Promise-based).
