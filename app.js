@@ -499,12 +499,15 @@ function showPage(id, el) {
 // Banner visibile solo nella pagina report
   if (isCapacitor && AdMob && !adsRemoved) {
     if (id === 'report') {
-      AdMob.showBanner({
-        adId: 'ca-app-pub-3940256099942544/6300978111',
-        adSize: BannerAdSize.BANNER,
-        position: BannerAdPosition.BOTTOM_CENTER,
-        margin: 0,
-      }).catch(() => {});
+      AdMob.resumeBanner().catch(() => {
+        // resumeBanner fallisce se il banner non esiste ancora, proviamo showBanner
+        AdMob.showBanner({
+          adId: 'ca-app-pub-3940256099942544/6300978111',
+          adSize: BannerAdSize.BANNER,
+          position: BannerAdPosition.BOTTOM_CENTER,
+          margin: 0,
+        }).catch(() => {});
+      });
     } else {
       AdMob.hideBanner().catch(() => {});
     }
