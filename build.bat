@@ -1,4 +1,3 @@
-Crea un file build.bat nella root del progetto con Blocco Note e incolla questo contenuto:
 bat@echo off
 echo Copio i file in www...
 copy index.html www\index.html

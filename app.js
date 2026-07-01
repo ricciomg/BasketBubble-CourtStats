@@ -134,6 +134,7 @@ const ACTION_MAP = {
   'toggleOppRoster()':             () => toggleOppRoster(),
   'toggleReportExport()':          () => toggleReportExport(),
   'toggleZoneSelection()':         () => toggleZoneSelection(),
+  'purchaseRemoveAds()':           () => purchaseRemoveAds(),
 };
 
 // pickZone(event,this) è speciale: viene usato sulle zone SVG generate staticamente
@@ -494,14 +495,26 @@ function showPage(id, el) {
   if(id==='roster')   renderRoster();
   if(id==='matches')  renderMatches();
   if(id==='settings') renderSettings();
+
+// Banner visibile solo nella pagina report
+  if (isCapacitor && AdMob && !adsRemoved) {
+    if (id === 'report') {
+      AdMob.showBanner({
+        adId: 'ca-app-pub-3940256099942544/6300978111',
+        adSize: BannerAdSize.BANNER,
+        position: BannerAdPosition.BOTTOM_CENTER,
+        margin: 0,
+      }).catch(() => {});
+    } else {
+      AdMob.hideBanner().catch(() => {});
+    }
+  }
+
+
 }
 function gotoPage(id) { showPage(id, document.querySelectorAll('.nav-item')[{roster:0,matches:1,live:2,report:3,settings:4}[id]]); }
 function openModal(id)  { document.getElementById(id).classList.add('open'); 
   
-  //BLOCCO PER NASCONDERE BANNER QUANDO SI APRE MODALE
-  if (isCapacitor && AdMob) {
-    AdMob.hideBanner().catch(() => {});
-  }
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -511,21 +524,6 @@ function closeModal(id) {
     if (m && m.status === 'setup') renderLiveSetup();
   }
 
-  //BLOCCO PER FAR RIAPPARIRE BANNER QUANDO SI CHIUDE MODALE
-  if (isCapacitor && AdMob) {
-    AdMob.showBanner({
-      adId: 'ca-app-pub-3940256099942544/6300978111',
-      adSize: BannerAdSize.BANNER,
-      position: BannerAdPosition.BOTTOM_CENTER,
-      margin: 0,
-    }).then(() => {
-      log('Banner ri-mostrato OK');
-      console.log('Banner ri-mostrato OK');
-    }).catch((e) => {
-      log('Errore showBanner in closeModal:' + e);
-      console.error('Errore showBanner in closeModal:', e);
-    });
-  }
 }
 
 function toast(msg,dur=2000) {
@@ -5465,35 +5463,7 @@ setInterval(() => { if (driveEnabled && settings.driveFeatureEnabled) { driveTok
 
 
 // ── AdMob - Advertising ────────────────────────────────────────────────────────
-async function initAds() {
-    
-  // RIMOZIONE ADVERTISING A PAGAMENTO
-    if (adsRemoved) return;
-
-    // ── DEBUG OVERLAY (rimuovi prima del publish) ──
-  const dbg = document.createElement('div');
-  dbg.style = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(0,0,0,.85);color:#0f0;font-size:11px;padding:8px;font-family:monospace;max-height:40vh;overflow-y:auto';
-  document.body.appendChild(dbg);
-  const log = (msg) => { dbg.innerHTML += msg + '<br>'; };
-
-  //RIMUOVERE log('isCapacitor: ' + isCapacitor);
-  //RIMUOVERE log('AdMob: ' + (typeof AdMob));
-
-
-  try {
-
-    await AdMob.initialize({ initializeForTesting: true });
-
-    await AdMob.showBanner({
-      adId: 'ca-app-pub-3940256099942544/6300978111', // test banner ID
-      adSize: BannerAdSize.BANNER,
-      position: BannerAdPosition.BOTTOM_CENTER,
-      margin: 0,  // ← togli il margin fisso, lo gestiamo noi via CSS
-    });
-
-    //log('showBanner OK');
-
-   function applyBannerOffset(bannerHeight) {
+function applyBannerOffset(bannerHeight) {
   const systemNavHeight = screen.height - window.innerHeight;
 
   const nav = document.querySelector('nav');
@@ -5510,38 +5480,24 @@ async function initAds() {
 
   const toast = document.getElementById('toast');
   if (toast) toast.style.bottom = (contentOffset + 16) + 'px';
-
-  // ── LOG DIAGNOSTICI VERI (leggono il valore reale, non testo fisso) ──
-  if (nav) {
-    const computed = getComputedStyle(nav);
-    //log('nav.offsetHeight: ' + nav.offsetHeight + 'px');
-    //log('nav padding-bottom (computed): ' + computed.paddingBottom);
-    //log('nav padding-top (computed): ' + computed.paddingTop);
-    const item = nav.querySelector('.nav-item');
-    if (item) {
-      //log('nav-item.offsetHeight: ' + item.offsetHeight + 'px');
-      //log('nav-item padding (computed): ' + getComputedStyle(item).padding);
-    }
-    const svg = nav.querySelector('.nav-item svg');
-    if (svg) {
-      //log('svg width/height (computed): ' + getComputedStyle(svg).width + ' / ' + getComputedStyle(svg).height);
-    }
-  }
 }
 
-    // Fallback immediato con stima
-    //applyBannerOffset(50);
+async function initAds() {
 
-    // fallback nel caso l'evento non scatti
+  // RIMOZIONE ADVERTISING A PAGAMENTO
+  if (adsRemoved) return;
+  if (!isCapacitor || !AdMob) return;
+
+  try {
+    await AdMob.initialize({ initializeForTesting: true });
+
+    AdMob.addListener(BannerAdPluginEvents.Loaded, (info) => {
+      applyBannerOffset(info.bannerHeight ?? 50);
+    });
+
     setTimeout(() => applyBannerOffset(50), 1000);
 
-    // Valore preciso quando AdMob lo comunica
-  AdMob.addListener(BannerAdPluginEvents.Loaded, (info) => {
-  const h = info.bannerHeight ?? 50;
-  applyBannerOffset(h);
-  });
   } catch(e) {
-    log('ERRORE: ' + e.message);
     console.warn('AdMob non disponibile:', e);
   }
 }
