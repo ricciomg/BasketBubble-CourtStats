@@ -296,9 +296,15 @@
 
 <!-- PAGE ROSTER -->
 <div class="page active" id="page-roster">
+    <!-- ═══ GOOGLE DRIVE STATUS BAR — DISABILITATA TEMPORANEAMENTE ═══
   <div id="drive-status-bar" class="drive-status" style="display:none"><span class="drive-dot drive-dot-off" id="drive-dot"></span><span id="drive-status-text">Non connesso</span><span style="margin-left:auto;color:var(--text3);cursor:pointer;font-size:10px" data-action="driveDisconnect()">Disconnetti</span></div>
+    ═══ FINE GOOGLE DRIVE STATUS BAR ═══ -->
   <div class="page-header" style="position:relative"><div class="page-title">ROSTER</div><div class="page-sub" id="roster-count">0 giocatori</div><img src="" class="page-logo" alt="logo squadra"/><img src="" class="app-logo-fixed" alt="BasketBubble"/></div>
-  <div style="padding:12px 16px 0;display:flex;gap:8px"><button class="btn btn-primary" style="flex:1" data-action="openModal('modal-add-player')" data-i18n="roster.add_btn">＋ Aggiungi</button><button id="drive-btn" class="drive-btn drive-btn-connect" data-action="driveToggle()" title="Sync Google Drive" style="display:none">&#9729; Drive</button></div>
+  <div style="padding:12px 16px 0;display:flex;gap:8px"><button class="btn btn-primary" style="flex:1" data-action="openModal('modal-add-player')" data-i18n="roster.add_btn">＋ Aggiungi</button>
+    <!-- ═══ PULSANTE SYNC GOOGLE DRIVE — DISABILITATO TEMPORANEAMENTE ═══
+    <button id="drive-btn" class="drive-btn drive-btn-connect" data-action="driveToggle()" title="Sync Google Drive" style="display:none">&#9729; Drive</button>
+  ═══ FINE PULSANTE SYNC GOOGLE DRIVE ═══ -->
+</div>
   <div id="roster-list"></div>
   <div class="empty-state" id="roster-empty"><div class="e-icon">🏀</div><p data-i18n="roster.empty_hint" data-i18n-html="true">Nessun giocatore.<br>Aggiungi il primo!</p></div>
 </div>
@@ -500,6 +506,7 @@
         <span id="export-toggle-label" style="font-size:13px;color:var(--text2)"></span>
       </div>
     </div>
+    <!-- ═══ CARD INTEGRAZIONE GOOGLE DRIVE — DISABILITATA TEMPORANEAMENTE ═══
     <div style="background:var(--surface);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px">
       <div style="font-size:14px;font-weight:600;color:var(--text1);margin-bottom:4px" data-i18n="settings.drive.title"></div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:10px"  data-i18n="settings.drive.desc"></div>
@@ -527,6 +534,8 @@
   <div id="drive-settings-status" style="font-size:11px;color:var(--text3);margin-top:6px"></div>
 </div>
     </div>
+     ═══ FINE COMMENTO CARD GOOGLE DRIVE ═══ -->
+
     <div style="background:var(--surface);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px">
        <div style="font-size:14px;font-weight:600;color:var(--text1);margin-bottom:4px" data-i18n="settings.logo.title"></div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:10px" data-i18n="settings.logo.desc"></div>
